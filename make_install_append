@@ -1,0 +1,18 @@
+cd horizon && django-admin compilemessages && cd ..
+cd openstack_dashboard && django-admin compilemessages && cd ..
+
+install -d -m 755 %{buildroot}/usr/share/httpd/horizon
+mv %{buildroot}%{python_sitelib}/openstack_dashboard/ %{buildroot}/usr/share/httpd/horizon/
+cp -a manage.py %{buildroot}/usr/share/httpd/horizon/
+
+mv %{buildroot}/usr/share/httpd/horizon/openstack_dashboard/local/local_settings.py{.example,}
+
+install -m 0755 -d %{buildroot}/usr/share/httpd/horizon/static
+cd %{buildroot}/usr/share/httpd/horizon && PYTHONPATH=%{buildroot}%{python_sitelib} %{__python} manage.py collectstatic --noinput && cd -
+cd %{buildroot}/usr/share/httpd/horizon && PYTHONPATH=%{buildroot}%{python_sitelib} %{__python} manage.py compress --force && cd -
+cp -a openstack_dashboard/static/* %{buildroot}/usr/share/httpd/horizon/static/
+cp -a horizon/static/* %{buildroot}/usr/share/httpd/horizon/static
+rm %{buildroot}/usr/share/httpd/horizon/openstack_dashboard/local/local_settings.pyc || :
+
+install -m 0755 -d %{buildroot}/usr/share/defaults/httpd/conf.d
+cp horizon.conf %{buildroot}/usr/share/defaults/httpd/conf.d

@@ -1,0 +1,42 @@
+From 79bfaa0300e9aee07e06b6179cf1949605ef86a0 Mon Sep 17 00:00:00 2001
+From: Alberto Murillo <alberto.murillo.silva@intel.com>
+Date: Mon, 13 Apr 2015 16:13:13 -0500
+Subject: [PATCH] enable dashboard in apache
+
+---
+ horizon.conf | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+ create mode 100644 horizon.conf
+
+diff --git a/horizon.conf b/horizon.conf
+new file mode 100644
+index 0000000..51a1c3b
+--- /dev/null
++++ b/horizon.conf
+@@ -0,0 +1,23 @@
++<VirtualHost *:80>
++    ErrorLog /var/log/httpd/horizon-error_log
++    TransferLog /var/log/httpd/horizon-access_log
++
++    WSGIScriptAlias / /usr/share/httpd/horizon/openstack_dashboard/wsgi/django.wsgi
++    WSGIDaemonProcess horizon user=horizon group=horizon processes=3 threads=10
++
++    DocumentRoot /usr/share/httpd/horizon/openstack_dashboard/
++    Alias /media /usr/share/httpd/horizon/media
++    Alias /static /usr/share/httpd/horizon/static
++
++    <Directory /usr/share/httpd/horizon/openstack_dashboard/>
++        Options FollowSymLinks MultiViews
++        AllowOverride None
++        Require all granted
++    </Directory>
++
++    <Directory /usr/share/httpd/horizon/static/>
++        Options FollowSymLinks MultiViews
++        AllowOverride None
++        Require all granted
++    </Directory>
++</VirtualHost>
+-- 
+2.1.0
+
