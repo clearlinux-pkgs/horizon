@@ -1,0 +1,142 @@
+From c6c73420bb081f71d3d582c49b106aabf046f253 Mon Sep 17 00:00:00 2001
+From: William Douglas <william.douglas@intel.com>
+Date: Tue, 15 Sep 2015 16:12:22 -0700
+Subject: [PATCH] Replace memoized for another solution
+
+memoized seemed to be ineffective for handling cases where we don't care
+about the exact object matching but only key fields. Try another
+solution that handles timeout and max cache size in addition to taking
+custom key creation functions to allow per function being memoized key selection.
+---
+ openstack_dashboard/api/nova.py | 83 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 78 insertions(+), 5 deletions(-)
+
+diff --git a/openstack_dashboard/api/nova.py b/openstack_dashboard/api/nova.py
+index c84c519..67c3423 100644
+--- a/openstack_dashboard/api/nova.py
++++ b/openstack_dashboard/api/nova.py
+@@ -41,6 +41,52 @@ from horizon.utils.memoized import memoized  # noqa
+ from openstack_dashboard.api import base
+ from openstack_dashboard.api import network_base
+ 
++import functools
++import time
++
++
++def memoize(get_key=None, cache_size=10, cache_timeout=10):
++    """Decorator for caching function call results.
++
++    Cache the decorated function's return value if possible based on the
++    caller provided get_key obtaining a dict key item for the argument(s) it
++    expects.
++
++    The cache will use the get_key function to identify the key store in cache.
++    The cache will be cleared after more than cache_size items are attempted to
++    be stored in it while individual items will be removed if they are older 
++    than the cache_timeout.
++    """
++    def wrapper(func):
++        cache = {}
++
++        @functools.wraps(func)
++        def wrapped(*args, **kwargs):
++            # Use the get_key function if defined otherwise we'll fall back to
++            # calling the function directly every time (expensive but provides
++            # an always working default).
++            if get_key:
++                key = get_key(args, kwargs)
++            try:
++                value, timestamp = cache[key]
++                if time.time() - timestamp > cache_timeout:
++                    cache.pop(key)
++                    raise
++                return value
++            except:
++                value = func(*args, **kwargs)
++            if len(cache) > cache_size:
++                cache.clear()
++            # Try and cache the result but if there are any problems just move
++            # on since missing out on a result store isn't fatal.
++            try:
++                cache[key] = (value, time.time())
++            except:
++                pass
++            return value
++        return wrapped
++    return wrapper
++
+ 
+ LOG = logging.getLogger(__name__)
+ 
+@@ -435,7 +481,15 @@ class FloatingIpManager(network_base.FloatingIpManager):
+         return True
+ 
+ 
+-@memoized
++def novaclient_memo_key(args, kwargs):
++    request = args[0]
++    key = str(request.user.username) + ':' + str(request.user.token.id) + \
++          ':' + str(request.user.tenant_id) + ':' + \
++          str(base.url_for(request, 'compute'))
++    return key
++
++
++@memoize(get_key=novaclient_memo_key)
+ def novaclient(request):
+     insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
+     cacert = getattr(settings, 'OPENSTACK_SSL_CACERT', None)
+@@ -493,7 +547,14 @@ def flavor_get(request, flavor_id, get_extras=False):
+     return flavor
+ 
+ 
+-@memoized
++def flavor_list_memo_key(args, kwargs):
++    is_public = str(kwargs.get('is_public'))
++    get_extras = str(kwargs.get('get_extras'))
++    key = is_public + ':' + get_extras + ':' + novaclient_memo_key(args, None)
++    return key
++
++
++@memoize(get_key=flavor_list_memo_key)
+ def flavor_list(request, is_public=True, get_extras=False):
+     """Get the list of available instance sizes (flavors)."""
+     flavors = novaclient(request).flavors.list(is_public=is_public)
+@@ -503,7 +564,13 @@ def flavor_list(request, is_public=True, get_extras=False):
+     return flavors
+ 
+ 
+-@memoized
++def flavor_access_list_memo_key(args, kwargs):
++    flavor = str(kwargs.get('flavor'))
++    key = flavor + ':' + novaclient_memo_key(args, None)
++    return key
++
++
++@memoize(get_key=flavor_access_list_memo_key)
+ def flavor_access_list(request, flavor=None):
+     """Get the list of access instance sizes (flavors)."""
+     return novaclient(request).flavor_access.list(flavor=flavor)
+@@ -917,12 +984,18 @@ def remove_host_from_aggregate(request, aggregate_id, host):
+     return novaclient(request).aggregates.remove_host(aggregate_id, host)
+ 
+ 
+-@memoized
++@memoize(get_key=novaclient_memo_key)
+ def list_extensions(request):
+     return nova_list_extensions.ListExtManager(novaclient(request)).show_all()
+ 
+ 
+-@memoized
++def extension_supported_memo_key(args, kwargs):
++    extension_name = args[0]
++    key = str(extension_name) + ':' + novaclient_memo_key(args[1:], None)
++    return key
++
++
++@memoize(get_key=extension_supported_memo_key)
+ def extension_supported(extension_name, request):
+     """Determine if nova supports a given extension name.
+ 
+-- 
+2.5.0
+
