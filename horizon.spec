@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 2015.1.1
-Release  : 23
+Release  : 24
 URL      : http://tarballs.openstack.org/horizon/horizon-2015.1.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-2015.1.1.tar.gz
 Summary  : OpenStack Dashboard
