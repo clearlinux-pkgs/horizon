@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 2015.1.1
-Release  : 24
+Release  : 25
 URL      : http://tarballs.openstack.org/horizon/horizon-2015.1.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-2015.1.1.tar.gz
 Summary  : OpenStack Dashboard
@@ -12,7 +12,6 @@ Group    : Development/Tools
 License  : Apache-2.0
 Requires: horizon-python
 Requires: horizon-data
-Requires: horizon-attr
 BuildRequires : Babel
 BuildRequires : Django
 BuildRequires : Jinja2-python
@@ -64,6 +63,7 @@ BuildRequires : extras
 BuildRequires : extras-python
 BuildRequires : fixtures-python
 BuildRequires : flake8-python
+BuildRequires : funcsigs-python
 BuildRequires : futures-python
 BuildRequires : greenlet-python
 BuildRequires : hacking-python
@@ -95,6 +95,7 @@ BuildRequires : oslo.i18n
 BuildRequires : oslo.serialization
 BuildRequires : oslo.utils
 BuildRequires : oslosphinx-python
+BuildRequires : pathlib-python
 BuildRequires : pbr
 BuildRequires : pbr-python
 BuildRequires : pep8-python
@@ -137,23 +138,20 @@ BuildRequires : testtools-python
 BuildRequires : traceback2-python
 BuildRequires : unittest2-python
 BuildRequires : warlock-python
+BuildRequires : wrapt-python
 BuildRequires : xvfbwrapper-python
 Patch1: 0001-enable-dashboard-in-apache.patch
 Patch2: 0002-default-config.patch
 Patch3: 0001-Replace-memoized-for-another-solution.patch
+Patch4: oslo_config.patch
+Patch5: oslo_serialization.patch
+Patch6: oslo_i18n.patch
+Patch7: cca93ade7c23c1f2794376161b6660a459292eee.patch
 
 %description
 =============================
 Horizon (OpenStack Dashboard)
 =============================
-
-%package attr
-Summary: attr components for the horizon package.
-Group: Default
-
-%description attr
-attr components for the horizon package.
-
 
 %package data
 Summary: data components for the horizon package.
@@ -166,6 +164,17 @@ data components for the horizon package.
 %package python
 Summary: python components for the horizon package.
 Group: Default
+Requires: Pint-python
+Requires: PyYAML-python
+Requires: eventlet-python
+Requires: httplib2-python
+Requires: kombu-python
+Requires: pbr-python
+Requires: pyScss-python
+Requires: python-ceilometerclient-python
+Requires: python-heatclient-python
+Requires: python-saharaclient-python
+Requires: pytz-python
 
 %description python
 python components for the horizon package.
@@ -176,6 +185,10 @@ python components for the horizon package.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 %build
 python2 setup.py build -b py2
@@ -205,1864 +218,13 @@ install -m 0755 -d %{buildroot}/usr/share/defaults/httpd/conf.d
 cp horizon.conf %{buildroot}/usr/share/defaults/httpd/conf.d
 ## make_install_append end
 
+%post data
+chown -R httpd:httpd /usr/share/httpd/horizon
 %files
 %defattr(-,root,root,-)
 
-%files attr
-%defattr(-,root,root,-)
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/action-list.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/action-list.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/action-list.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/action.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/button-tooltip.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/menu-item.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/menu.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/single-button.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/split-button.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/action-list/warning-tooltip.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/bind-scope/bind-scope.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/bind-scope/bind-scope.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/chart-tooltip.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/chart-tooltip.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/chart-tooltip.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/charts.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/pie-chart.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/pie-chart.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/pie-chart.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/charts/pie-chart.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/form/form.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/form/form.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/help-panel/help-panel.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/help-panel/help-panel.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/help-panel/help-panel.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/help-panel/help-panel.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/login/login.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/login/login.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/magic-search/magic-search.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/magic-search/magic-search.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/magic-search/magic-search.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree-item.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree-service.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/modal/modal.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/modal/modal.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/modal/simple-modal.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/styles.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/table/basic-table.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/table/basic-table.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/table/search-bar.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/table/table.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/table/table.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/table/table.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/transfer-table/allocated.html.example
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/transfer-table/available.html.example
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/validators/validators.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/validators/validators.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/widget.module.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/wizard/wizard.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/wizard/wizard.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/wizard/wizard.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/wizard/wizard.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/workflow/workflow.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/angular/workflow/workflow.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.eot
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.ttf
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.woff
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap-sprockets.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/affix.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/alert.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/button.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/carousel.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/collapse.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/dropdown.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/modal.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/popover.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/scrollspy.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/tab.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/tooltip.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/transition.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-compass.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-mincer.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-sprockets.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_alerts.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_badges.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_breadcrumbs.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_button-groups.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_buttons.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_carousel.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_close.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_code.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_component-animations.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_dropdowns.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_forms.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_glyphicons.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_grid.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_input-groups.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_jumbotron.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_labels.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_list-group.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_media.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_mixins.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_modals.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_navbar.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_navs.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_normalize.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_pager.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_pagination.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_panels.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_popovers.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_print.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_progress-bars.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_responsive-embed.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_responsive-utilities.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_scaffolding.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_tables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_theme.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_thumbnails.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_tooltip.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_type.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_utilities.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_variables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_wells.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/bootstrap.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_alerts.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_background-variant.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_border-radius.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_buttons.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_center-block.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_clearfix.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_forms.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_gradients.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_grid-framework.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_grid.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_hide-text.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_image.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_labels.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_list-group.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_nav-divider.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_nav-vertical-align.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_opacity.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_pagination.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_panels.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_progress-bar.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_reset-filter.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_resize.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_responsive-visibility.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_size.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_tab-focus.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_table-row.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_text-emphasis.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_text-overflow.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_vendor-prefixes.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/custom/_styles.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/custom/_variables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/cloud-services/cloud-services.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/cloud-services/cloud-services.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/css/c472c0f02139.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/css/d7fc3590f4a6.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/dashboard.module.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/dashboard.module.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/dashboard.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.eot
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.ttf
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.woff
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/action_required.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/db-gray.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/db-gray.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/db-green.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/db-red.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/drag.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/drop_arrow.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/favicon.ico
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/lb-gray.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/lb-gray.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/lb-green.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/lb-red.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/loading.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/logo-splash.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/logo.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/profile_drop.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/right_droparrow.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/router.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/search.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/server-gray.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/server-gray.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/server-green.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/server-red.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/server.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/sidebar_bg.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/spinner.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/stack-gray.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/stack-gray.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/stack-green.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/stack-red.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/unknown-gray.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/unknown-gray.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/unknown-green.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/unknown-red.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/img/up_arrow.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/js/76407d7f5aff.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/js/76adef98ad14.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/js/87acf9c3aa9c.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.help.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/load-edit.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/load-edit.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.help.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/select-flavor-table.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/select-flavor-table.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/create-keypair.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/import-keypair.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair-details.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.help.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/new-keypair.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.model.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.model.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.help.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/keypair-details.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-group-details.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.help.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source-details.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.help.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/manifest.json
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/_mixins.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/_splash.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/_variables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_accordion_nav.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_charts.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_inline_edit.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_network_topology.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_resource_browser.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_topbar.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/components/_workflow.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/horizon.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/scss/serial_console.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/workflow/workflow.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/dashboard/workflow/workflow.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/controllers/dummy.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/controllers/modal-form-update-metadata-ctrl.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/controllers/namespace-controller.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/directives/forms.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/directives/serialConsole.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/filters/filters.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/filters/filters.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/horizon.conf.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/horizon.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/hz.api.module.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/horizon.utils.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.cinder.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.config.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.config.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.glance.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.keystone.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.neutron.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.nova.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.policy.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.security-group.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.service.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.service.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.accordion_nav.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.communication.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.d3barchart.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.d3linechart.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.d3piechart.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.datepickers.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.firewalls.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.forms.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.formset_table.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.heattop.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.images.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.instances.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.membership.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.messages.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.metering.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.modals.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.networktopology.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.quota.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.tables.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.tables_inline_edit.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.tabs.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.templates.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/js/horizon.users.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-animate.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-aria.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-bootstrap.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-cookies.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-csp.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-loader.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-messages.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-mocks.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-resource.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-route.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-sanitize.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-scenario.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular-touch.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/angular.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/errors.json
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/lrdragndrop.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/smart-table.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/version.json
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/angular/version.txt
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/bootstrap-datepicker.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/datepicker.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/datepicker3.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ar.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.az.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.bg.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ca.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.cs.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.cy.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.da.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.de.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.el.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.es.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.et.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fa.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fi.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fr.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.gl.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.he.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.hr.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.hu.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.id.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.is.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.it.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ja.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ka.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.kk.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.kr.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.lt.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.lv.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.mk.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ms.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nb.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nl-BE.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nl.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.no.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pl.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pt-BR.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pt.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ro.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.rs-latin.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.rs.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ru.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sk.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sl.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sq.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sv.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sw.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.th.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.tr.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ua.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.vi.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-CN.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-TW.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/d3.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.css.map
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/FontAwesome.otf
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.eot
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.svg
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.ttf
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.woff
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.woff2
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/animated.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/bordered-pulled.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/core.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/fixed-width.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/font-awesome.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/icons.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/larger.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/list.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/mixins.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/path.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/rotated-flipped.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/stacked.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/variables.less
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_animated.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_bordered-pulled.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_core.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_fixed-width.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_icons.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_larger.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_list.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_mixins.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_path.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_rotated-flipped.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_stacked.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_variables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/font-awesome.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/hogan.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jasmine/boot.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jasmine/console.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine-html.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine_favicon.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_diagonals-thick_18_b81900_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_diagonals-thick_20_666666_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_flat_10_000000_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_100_f6f6f6_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_100_fdf5ce_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_65_ffffff_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_gloss-wave_35_f6a828_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_highlight-soft_100_eeeeee_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_highlight-soft_75_ffe45c_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_228ef1_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ef8c08_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ffd27a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.min.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.structure.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.structure.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.theme.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_diagonals-thick_8_333333_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_flat_65_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_glass_40_111111_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_glass_55_1c1c1c_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-hard_100_f9f9f9_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-hard_40_aaaaaa_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-soft_50_aaaaaa_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_inset-hard_45_cd0a0a_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_inset-hard_55_ffeb80_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_4ca300_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_bbbbbb_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ededed_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ffcf29_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_diagonals-thick_75_f3d8d8_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_dots-small_65_a6a6a6_2x2.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_0_333333_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_65_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_75_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_glass_55_fbf8ee_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-hard_100_eeeeee_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-hard_100_f6f6f6_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-soft_15_cc0000_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_004276_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_cc0000_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_100_e4f1fb_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-soft_100_deedf7_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-soft_25_ffef8f_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_2694e8_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_2e83ff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_3d80b3_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_72a7cf_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_flat_30_cccccc_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_flat_50_5c5c5c_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_glass_40_ffc73d_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-hard_20_0972a5_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_33_003147_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_35_222222_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_44_444444_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_loop_25_000000_21x21.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_4b8e0b_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_a83300_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_cccccc_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_diagonals-thick_15_0b3e6f_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-medium_30_0b58a2_4x4.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_20_333333_2x2.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_30_a32d00_2x2.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_40_00498f_2x2.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_flat_40_292929_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_gloss-wave_20_111111_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_00498f_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_98d2fb_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_9ccdfc_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_0_eeeeee_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_55_994d53_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_55_fafafa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_gloss-wave_30_3d3644_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_100_dcd9de_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_100_eae6ea_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_25_30273a_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_45_5f5964_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_454545_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_734d99_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_8d78a5_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_a8a3ae_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_ebccce_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-small_25_c5ddfc_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_22_1484e6_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_26_2293f7_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_flat_0_e69700_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_flat_0_e6b900_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_highlight-soft_100_f9f9f9_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_inset-hard_100_eeeeee_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_0a82eb_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_0b54d5_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_5fa5e3_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_fcdd4a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_0_eeeeee_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_55_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_75_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_glass_65_ffffff_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_100_f6f6f6_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_25_0073ea_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_50_dddddd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_0073ea_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_454545_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_666666_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_ff0084_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_40_db4865_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_50_93c3cd_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_50_ff3853_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_75_ccd232_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_dots-medium_80_ffff38_4x4.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_dots-small_35_35414f_2x2.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_flat_75_ba9217_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_flat_75_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_white-lines_85_f7f7ba_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_454545_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_88a206_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_c02669_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_e1e463_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_ffeb33_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_flat_75_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_100_f5f0e5_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_25_cb842e_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_70_ede4d4_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_100_f4f0ec_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_65_fee4bd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_75_f5f5b5_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_inset-soft_100_f4f0ec_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_c47a23_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_cb672b_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_f08000_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_f35f07_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_ff7519_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-small_0_aaaaaa_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-thick_15_444444_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-thick_95_ffdc2e_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_glass_55_fbf5d0_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-hard_30_285c00_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_33_3a8104_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_50_4eb305_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_60_4ca20b_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_inset-soft_10_285c00_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_4eb305_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_72b42d_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_cd0a0a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_glass_15_5f391b_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_20_1c160d_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_25_453326_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_30_44372c_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_highlight-soft_20_201913_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_highlight-soft_20_619226_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_inset-soft_10_201913_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_9bcc60_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_add978_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_e3ddc9_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_f1fd86_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_0_eeeeee_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_55_c0402a_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_55_eeeeee_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_100_f8f8f8_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_35_dddddd_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_60_eeeeee_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_inset-hard_75_999999_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_inset-soft_50_c9c9c9_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_3383bb_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_454545_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_70b2e1_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_999999_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_fbc856_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_diagonal-maze_20_6e4f1c_10x10.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_diagonal-maze_40_000000_10x10.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_10_f8f7f6_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_eceadf_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_f7f3de_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_ffffff_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_65_654b24_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_68_b83400_60x60.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_3572ac_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_8c291d_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_b83400_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_fbdb93_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_flat_55_fbec88_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_75_d0e5f5_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_85_dfeffc_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_95_fef1ec_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_gloss-wave_55_5c9ccc_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_inset-hard_100_f5f8f9_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_inset-hard_100_fcfdfd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_217bc0_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_2e83ff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_469bdd_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_6da8d5_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_cd0a0a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_d8e7f3_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_f9bd01_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_flat_75_ffffff_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_55_fbf9ee_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_95_fef1ec_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_highlight-soft_75_cccccc_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_2e83ff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_454545_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_888888_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_cd0a0a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_glass_55_fcf0ba_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_gloss-wave_100_ece8da_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_100_f5f3e5_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_100_fafaf4_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_15_459e00_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_95_cccccc_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-soft_25_67b021_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-soft_95_ffedad_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_inset-soft_15_2b2922_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_808080_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_847e71_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_8DC262_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_cd0a0a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_eeeeee_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_flat_55_999999_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_flat_75_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_45_0078ae_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_55_f8da4e_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_75_79c9ec_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_45_e14f1c_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_50_6eac2c_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_75_2191c0_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_inset-hard_100_fcfdfd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_0078ae_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_056b93_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_d8e7f3_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_e0fdff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_f5e175_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_f7a50d_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_fcd113_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_diagonals-medium_20_d34d17_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_flat_30_cccccc_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_flat_50_5c5c5c_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_45_817865_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_60_fece2f_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_90_fff9e5_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_highlight-soft_100_feeebd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_inset-soft_30_ffffff_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_3d3d3d_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_bd7b00_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_d19405_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_eb990f_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_ed9f26_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_fadc7a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_ffe180_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_10_4f4221_10x8.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_20_372806_10x8.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_25_675423_10x8.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_25_d5ac5d_10x8.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_8_261803_10x8.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_8_443113_10x8.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_flat_75_ddd4b0_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_highlight-hard_65_fee4bd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_070603_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_e8e2b5_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_e9cd86_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_efec9f_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_f2ec64_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_f9f2bd_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_ff7519_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_diagonals-small_50_262626_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_flat_0_303030_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_flat_0_4c4c4c_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_40_0a0a0a_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_55_f1fbe5_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_60_000000_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_85_9fda58_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_95_f6ecd5_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_000000_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_1f1f1f_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_9fda58_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_b8ec79_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_cd0a0a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_flat_30_cccccc_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_flat_50_5c5c5c_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_20_555555_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_40_0078a3_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_40_ffc73d_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_gloss-wave_25_333333_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_inset-soft_25_000000_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_inset-soft_30_f58400_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_4b8e0b_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_a83300_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_cccccc_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_flat_10_000000_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_222222_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_228ef1_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ef8c08_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ffd27a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ffffff_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/animated-overlay.gif
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_flat_0_aaaaaa_40x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_glass_95_fef1ec_1x400.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_gloss-wave_16_121212_500x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-hard_15_888888_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-hard_55_555555_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-soft_35_adadad_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-soft_60_dddddd_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_inset-soft_15_121212_1x100.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_666666_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_aaaaaa_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_bbbbbb_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_c98000_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_cccccc_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_cd0a0a_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_f29a00_256x240.png
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/jquery-ui.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/jquery-ui.min.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/theme.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery-migrate.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery-migrate.min.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.bootstrap.wizard.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.min.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.quicksearch.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.tablesorter.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/jsencrypt/jsencrypt.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.html
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/qunit/qunit.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/qunit/qunit.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/rickshaw.css
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/rickshaw.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/spin.jquery.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/spin.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/lib/term.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/tests/instances.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/tests/jasmine/utils.spec.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/tests/messages.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/tests/modals.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/tests/tables.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/horizon/tests/templates.js
-%attr(-,80,80) /usr/share/httpd/horizon/static/themes/blue/_styles.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/themes/blue/_variables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/themes/default/_styles.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/themes/default/_variables.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/themes/webroot/_styles.scss
-%attr(-,80,80) /usr/share/httpd/horizon/static/themes/webroot/_variables.scss
-
 %files data
 %defattr(-,root,root,-)
-%exclude /usr/share/httpd/horizon/static/angular/action-list/action-list.js
-%exclude /usr/share/httpd/horizon/static/angular/action-list/action-list.scss
-%exclude /usr/share/httpd/horizon/static/angular/action-list/action-list.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/action-list/action.html
-%exclude /usr/share/httpd/horizon/static/angular/action-list/button-tooltip.js
-%exclude /usr/share/httpd/horizon/static/angular/action-list/menu-item.html
-%exclude /usr/share/httpd/horizon/static/angular/action-list/menu.html
-%exclude /usr/share/httpd/horizon/static/angular/action-list/single-button.html
-%exclude /usr/share/httpd/horizon/static/angular/action-list/split-button.html
-%exclude /usr/share/httpd/horizon/static/angular/action-list/warning-tooltip.html
-%exclude /usr/share/httpd/horizon/static/angular/bind-scope/bind-scope.js
-%exclude /usr/share/httpd/horizon/static/angular/bind-scope/bind-scope.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/charts/chart-tooltip.html
-%exclude /usr/share/httpd/horizon/static/angular/charts/chart-tooltip.js
-%exclude /usr/share/httpd/horizon/static/angular/charts/chart-tooltip.scss
-%exclude /usr/share/httpd/horizon/static/angular/charts/charts.js
-%exclude /usr/share/httpd/horizon/static/angular/charts/pie-chart.html
-%exclude /usr/share/httpd/horizon/static/angular/charts/pie-chart.js
-%exclude /usr/share/httpd/horizon/static/angular/charts/pie-chart.scss
-%exclude /usr/share/httpd/horizon/static/angular/charts/pie-chart.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/form/form.js
-%exclude /usr/share/httpd/horizon/static/angular/form/form.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/help-panel/help-panel.html
-%exclude /usr/share/httpd/horizon/static/angular/help-panel/help-panel.js
-%exclude /usr/share/httpd/horizon/static/angular/help-panel/help-panel.scss
-%exclude /usr/share/httpd/horizon/static/angular/help-panel/help-panel.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/login/login.js
-%exclude /usr/share/httpd/horizon/static/angular/login/login.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/magic-search/magic-search.html
-%exclude /usr/share/httpd/horizon/static/angular/magic-search/magic-search.js
-%exclude /usr/share/httpd/horizon/static/angular/magic-search/magic-search.scss
-%exclude /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.html
-%exclude /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.js
-%exclude /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.scss
-%exclude /usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree-item.html
-%exclude /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree-service.js
-%exclude /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.html
-%exclude /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.js
-%exclude /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.scss
-%exclude /usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.js
-%exclude /usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.scss
-%exclude /usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/modal/modal.js
-%exclude /usr/share/httpd/horizon/static/angular/modal/modal.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/modal/simple-modal.html
-%exclude /usr/share/httpd/horizon/static/angular/styles.scss
-%exclude /usr/share/httpd/horizon/static/angular/table/basic-table.js
-%exclude /usr/share/httpd/horizon/static/angular/table/basic-table.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/table/search-bar.html
-%exclude /usr/share/httpd/horizon/static/angular/table/table.js
-%exclude /usr/share/httpd/horizon/static/angular/table/table.scss
-%exclude /usr/share/httpd/horizon/static/angular/table/table.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/transfer-table/allocated.html.example
-%exclude /usr/share/httpd/horizon/static/angular/transfer-table/available.html.example
-%exclude /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.html
-%exclude /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.js
-%exclude /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.scss
-%exclude /usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/validators/validators.js
-%exclude /usr/share/httpd/horizon/static/angular/validators/validators.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/widget.module.js
-%exclude /usr/share/httpd/horizon/static/angular/wizard/wizard.html
-%exclude /usr/share/httpd/horizon/static/angular/wizard/wizard.js
-%exclude /usr/share/httpd/horizon/static/angular/wizard/wizard.scss
-%exclude /usr/share/httpd/horizon/static/angular/wizard/wizard.spec.js
-%exclude /usr/share/httpd/horizon/static/angular/workflow/workflow.js
-%exclude /usr/share/httpd/horizon/static/angular/workflow/workflow.spec.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.eot
-%exclude /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.svg
-%exclude /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.ttf
-%exclude /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.woff
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap-sprockets.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/affix.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/alert.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/button.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/carousel.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/collapse.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/dropdown.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/modal.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/popover.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/scrollspy.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/tab.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/tooltip.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/transition.js
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-compass.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-mincer.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-sprockets.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_alerts.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_badges.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_breadcrumbs.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_button-groups.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_buttons.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_carousel.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_close.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_code.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_component-animations.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_dropdowns.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_forms.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_glyphicons.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_grid.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_input-groups.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_jumbotron.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_labels.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_list-group.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_media.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_mixins.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_modals.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_navbar.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_navs.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_normalize.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_pager.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_pagination.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_panels.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_popovers.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_print.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_progress-bars.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_responsive-embed.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_responsive-utilities.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_scaffolding.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_tables.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_theme.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_thumbnails.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_tooltip.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_type.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_utilities.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_variables.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_wells.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/bootstrap.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_alerts.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_background-variant.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_border-radius.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_buttons.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_center-block.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_clearfix.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_forms.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_gradients.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_grid-framework.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_grid.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_hide-text.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_image.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_labels.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_list-group.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_nav-divider.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_nav-vertical-align.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_opacity.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_pagination.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_panels.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_progress-bar.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_reset-filter.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_resize.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_responsive-visibility.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_size.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_tab-focus.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_table-row.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_text-emphasis.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_text-overflow.scss
-%exclude /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_vendor-prefixes.scss
-%exclude /usr/share/httpd/horizon/static/custom/_styles.scss
-%exclude /usr/share/httpd/horizon/static/custom/_variables.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/cloud-services/cloud-services.js
-%exclude /usr/share/httpd/horizon/static/dashboard/cloud-services/cloud-services.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/css/c472c0f02139.css
-%exclude /usr/share/httpd/horizon/static/dashboard/css/d7fc3590f4a6.css
-%exclude /usr/share/httpd/horizon/static/dashboard/dashboard.module.js
-%exclude /usr/share/httpd/horizon/static/dashboard/dashboard.module.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/dashboard.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.eot
-%exclude /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.ttf
-%exclude /usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.woff
-%exclude /usr/share/httpd/horizon/static/dashboard/img/action_required.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/db-gray.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/db-gray.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/db-green.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/db-red.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/drag.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/drop_arrow.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/favicon.ico
-%exclude /usr/share/httpd/horizon/static/dashboard/img/lb-gray.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/lb-gray.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/lb-green.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/lb-red.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/loading.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/logo-splash.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/logo.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/profile_drop.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/right_droparrow.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/router.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/search.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/server-gray.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/server-gray.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/server-green.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/server-red.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/server.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/sidebar_bg.png
-%exclude /usr/share/httpd/horizon/static/dashboard/img/spinner.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/stack-gray.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/stack-gray.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/stack-green.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/stack-red.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/unknown-gray.gif
-%exclude /usr/share/httpd/horizon/static/dashboard/img/unknown-gray.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/unknown-green.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/unknown-red.svg
-%exclude /usr/share/httpd/horizon/static/dashboard/img/up_arrow.png
-%exclude /usr/share/httpd/horizon/static/dashboard/js/76407d7f5aff.js
-%exclude /usr/share/httpd/horizon/static/dashboard/js/76adef98ad14.js
-%exclude /usr/share/httpd/horizon/static/dashboard/js/87acf9c3aa9c.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.help.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/load-edit.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/load-edit.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.help.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/select-flavor-table.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/select-flavor-table.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/create-keypair.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/import-keypair.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair-details.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.help.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/new-keypair.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.model.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.model.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.help.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/keypair-details.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-group-details.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.help.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source-details.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.help.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.html
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.js
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.spec.js
-%exclude /usr/share/httpd/horizon/static/dashboard/manifest.json
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/_mixins.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/_splash.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/_variables.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_accordion_nav.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_charts.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_inline_edit.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_network_topology.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_resource_browser.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_topbar.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/components/_workflow.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/horizon.scss
-%exclude /usr/share/httpd/horizon/static/dashboard/scss/serial_console.css
-%exclude /usr/share/httpd/horizon/static/dashboard/workflow/workflow.js
-%exclude /usr/share/httpd/horizon/static/dashboard/workflow/workflow.spec.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/controllers/dummy.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/controllers/modal-form-update-metadata-ctrl.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/controllers/namespace-controller.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/directives/forms.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/directives/serialConsole.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/filters/filters.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/filters/filters.spec.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/horizon.conf.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/horizon.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/hz.api.module.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/horizon.utils.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.cinder.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.config.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.config.spec.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.glance.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.keystone.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.neutron.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.nova.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.policy.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.security-group.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.service.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.service.spec.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.accordion_nav.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.communication.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.d3barchart.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.d3linechart.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.d3piechart.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.datepickers.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.firewalls.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.forms.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.formset_table.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.heattop.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.images.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.instances.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.membership.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.messages.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.metering.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.modals.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.networktopology.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.quota.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.tables.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.tables_inline_edit.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.tabs.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.templates.js
-%exclude /usr/share/httpd/horizon/static/horizon/js/horizon.users.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-animate.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-aria.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-bootstrap.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-cookies.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-csp.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-loader.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-messages.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-mocks.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-resource.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-route.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-sanitize.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-scenario.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular-touch.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/angular.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/errors.json
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/lrdragndrop.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/smart-table.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/version.json
-%exclude /usr/share/httpd/horizon/static/horizon/lib/angular/version.txt
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/bootstrap-datepicker.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/datepicker.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/datepicker3.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ar.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.az.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.bg.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ca.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.cs.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.cy.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.da.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.de.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.el.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.es.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.et.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fa.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fi.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fr.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.gl.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.he.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.hr.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.hu.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.id.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.is.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.it.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ja.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ka.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.kk.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.kr.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.lt.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.lv.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.mk.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ms.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nb.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nl-BE.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nl.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.no.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pl.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pt-BR.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pt.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ro.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.rs-latin.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.rs.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ru.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sk.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sl.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sq.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sv.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sw.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.th.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.tr.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ua.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.vi.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-CN.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-TW.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/d3.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.css.map
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/FontAwesome.otf
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.eot
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.svg
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.ttf
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.woff
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.woff2
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/animated.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/bordered-pulled.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/core.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/fixed-width.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/font-awesome.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/icons.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/larger.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/list.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/mixins.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/path.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/rotated-flipped.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/stacked.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/variables.less
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_animated.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_bordered-pulled.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_core.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_fixed-width.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_icons.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_larger.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_list.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_mixins.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_path.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_rotated-flipped.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_stacked.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_variables.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/font-awesome.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/hogan.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jasmine/boot.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jasmine/console.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine-html.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine_favicon.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_diagonals-thick_18_b81900_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_diagonals-thick_20_666666_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_flat_10_000000_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_100_f6f6f6_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_100_fdf5ce_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_65_ffffff_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_gloss-wave_35_f6a828_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_highlight-soft_100_eeeeee_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_highlight-soft_75_ffe45c_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_228ef1_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ef8c08_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ffd27a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.min.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.structure.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.structure.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.theme.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_diagonals-thick_8_333333_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_flat_65_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_glass_40_111111_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_glass_55_1c1c1c_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-hard_100_f9f9f9_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-hard_40_aaaaaa_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-soft_50_aaaaaa_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_inset-hard_45_cd0a0a_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_inset-hard_55_ffeb80_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_4ca300_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_bbbbbb_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ededed_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ffcf29_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_diagonals-thick_75_f3d8d8_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_dots-small_65_a6a6a6_2x2.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_0_333333_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_65_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_75_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_glass_55_fbf8ee_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-hard_100_eeeeee_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-hard_100_f6f6f6_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-soft_15_cc0000_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_004276_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_cc0000_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_100_e4f1fb_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-soft_100_deedf7_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-soft_25_ffef8f_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_2694e8_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_2e83ff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_3d80b3_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_72a7cf_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_flat_30_cccccc_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_flat_50_5c5c5c_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_glass_40_ffc73d_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-hard_20_0972a5_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_33_003147_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_35_222222_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_44_444444_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_loop_25_000000_21x21.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_4b8e0b_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_a83300_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_cccccc_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_diagonals-thick_15_0b3e6f_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-medium_30_0b58a2_4x4.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_20_333333_2x2.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_30_a32d00_2x2.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_40_00498f_2x2.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_flat_40_292929_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_gloss-wave_20_111111_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_00498f_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_98d2fb_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_9ccdfc_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_0_eeeeee_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_55_994d53_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_55_fafafa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_gloss-wave_30_3d3644_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_100_dcd9de_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_100_eae6ea_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_25_30273a_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_45_5f5964_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_454545_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_734d99_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_8d78a5_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_a8a3ae_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_ebccce_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-small_25_c5ddfc_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_22_1484e6_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_26_2293f7_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_flat_0_e69700_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_flat_0_e6b900_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_highlight-soft_100_f9f9f9_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_inset-hard_100_eeeeee_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_0a82eb_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_0b54d5_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_5fa5e3_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_fcdd4a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_0_eeeeee_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_55_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_75_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_glass_65_ffffff_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_100_f6f6f6_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_25_0073ea_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_50_dddddd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_0073ea_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_454545_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_666666_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_ff0084_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_40_db4865_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_50_93c3cd_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_50_ff3853_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_75_ccd232_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_dots-medium_80_ffff38_4x4.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_dots-small_35_35414f_2x2.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_flat_75_ba9217_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_flat_75_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_white-lines_85_f7f7ba_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_454545_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_88a206_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_c02669_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_e1e463_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_ffeb33_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_flat_75_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_100_f5f0e5_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_25_cb842e_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_70_ede4d4_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_100_f4f0ec_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_65_fee4bd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_75_f5f5b5_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_inset-soft_100_f4f0ec_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_c47a23_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_cb672b_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_f08000_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_f35f07_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_ff7519_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-small_0_aaaaaa_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-thick_15_444444_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-thick_95_ffdc2e_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_glass_55_fbf5d0_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-hard_30_285c00_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_33_3a8104_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_50_4eb305_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_60_4ca20b_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_inset-soft_10_285c00_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_4eb305_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_72b42d_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_cd0a0a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_glass_15_5f391b_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_20_1c160d_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_25_453326_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_30_44372c_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_highlight-soft_20_201913_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_highlight-soft_20_619226_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_inset-soft_10_201913_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_9bcc60_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_add978_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_e3ddc9_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_f1fd86_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_0_eeeeee_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_55_c0402a_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_55_eeeeee_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_100_f8f8f8_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_35_dddddd_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_60_eeeeee_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_inset-hard_75_999999_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_inset-soft_50_c9c9c9_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_3383bb_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_454545_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_70b2e1_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_999999_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_fbc856_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_diagonal-maze_20_6e4f1c_10x10.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_diagonal-maze_40_000000_10x10.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_10_f8f7f6_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_eceadf_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_f7f3de_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_ffffff_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_65_654b24_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_68_b83400_60x60.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_3572ac_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_8c291d_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_b83400_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_fbdb93_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_flat_55_fbec88_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_75_d0e5f5_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_85_dfeffc_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_95_fef1ec_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_gloss-wave_55_5c9ccc_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_inset-hard_100_f5f8f9_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_inset-hard_100_fcfdfd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_217bc0_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_2e83ff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_469bdd_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_6da8d5_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_cd0a0a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_d8e7f3_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_f9bd01_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_flat_75_ffffff_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_55_fbf9ee_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_95_fef1ec_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_highlight-soft_75_cccccc_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_2e83ff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_454545_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_888888_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_cd0a0a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_glass_55_fcf0ba_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_gloss-wave_100_ece8da_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_100_f5f3e5_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_100_fafaf4_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_15_459e00_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_95_cccccc_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-soft_25_67b021_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-soft_95_ffedad_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_inset-soft_15_2b2922_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_808080_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_847e71_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_8DC262_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_cd0a0a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_eeeeee_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_flat_55_999999_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_flat_75_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_45_0078ae_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_55_f8da4e_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_75_79c9ec_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_45_e14f1c_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_50_6eac2c_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_75_2191c0_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_inset-hard_100_fcfdfd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_0078ae_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_056b93_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_d8e7f3_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_e0fdff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_f5e175_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_f7a50d_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_fcd113_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_diagonals-medium_20_d34d17_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_flat_30_cccccc_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_flat_50_5c5c5c_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_45_817865_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_60_fece2f_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_90_fff9e5_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_highlight-soft_100_feeebd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_inset-soft_30_ffffff_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_3d3d3d_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_bd7b00_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_d19405_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_eb990f_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_ed9f26_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_fadc7a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_ffe180_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_10_4f4221_10x8.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_20_372806_10x8.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_25_675423_10x8.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_25_d5ac5d_10x8.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_8_261803_10x8.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_8_443113_10x8.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_flat_75_ddd4b0_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_highlight-hard_65_fee4bd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_070603_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_e8e2b5_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_e9cd86_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_efec9f_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_f2ec64_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_f9f2bd_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_ff7519_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_diagonals-small_50_262626_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_flat_0_303030_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_flat_0_4c4c4c_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_40_0a0a0a_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_55_f1fbe5_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_60_000000_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_85_9fda58_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_95_f6ecd5_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_000000_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_1f1f1f_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_9fda58_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_b8ec79_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_cd0a0a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_flat_30_cccccc_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_flat_50_5c5c5c_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_20_555555_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_40_0078a3_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_40_ffc73d_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_gloss-wave_25_333333_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_inset-soft_25_000000_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_inset-soft_30_f58400_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_4b8e0b_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_a83300_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_cccccc_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_flat_10_000000_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_222222_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_228ef1_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ef8c08_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ffd27a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ffffff_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/animated-overlay.gif
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_flat_0_aaaaaa_40x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_glass_95_fef1ec_1x400.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_gloss-wave_16_121212_500x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-hard_15_888888_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-hard_55_555555_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-soft_35_adadad_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-soft_60_dddddd_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_inset-soft_15_121212_1x100.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_666666_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_aaaaaa_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_bbbbbb_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_c98000_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_cccccc_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_cd0a0a_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_f29a00_256x240.png
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/jquery-ui.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/jquery-ui.min.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/theme.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery-migrate.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery-migrate.min.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.bootstrap.wizard.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.min.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.quicksearch.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.tablesorter.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/jsencrypt/jsencrypt.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.html
-%exclude /usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.scss
-%exclude /usr/share/httpd/horizon/static/horizon/lib/qunit/qunit.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/qunit/qunit.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/rickshaw.css
-%exclude /usr/share/httpd/horizon/static/horizon/lib/rickshaw.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/spin.jquery.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/spin.js
-%exclude /usr/share/httpd/horizon/static/horizon/lib/term.js
-%exclude /usr/share/httpd/horizon/static/horizon/tests/instances.js
-%exclude /usr/share/httpd/horizon/static/horizon/tests/jasmine/utils.spec.js
-%exclude /usr/share/httpd/horizon/static/horizon/tests/messages.js
-%exclude /usr/share/httpd/horizon/static/horizon/tests/modals.js
-%exclude /usr/share/httpd/horizon/static/horizon/tests/tables.js
-%exclude /usr/share/httpd/horizon/static/horizon/tests/templates.js
-%exclude /usr/share/httpd/horizon/static/themes/blue/_styles.scss
-%exclude /usr/share/httpd/horizon/static/themes/blue/_variables.scss
-%exclude /usr/share/httpd/horizon/static/themes/default/_styles.scss
-%exclude /usr/share/httpd/horizon/static/themes/default/_variables.scss
-%exclude /usr/share/httpd/horizon/static/themes/webroot/_styles.scss
-%exclude /usr/share/httpd/horizon/static/themes/webroot/_variables.scss
 /usr/share/defaults/httpd/conf.d/horizon.conf
 /usr/share/httpd/horizon/manage.py
 /usr/share/httpd/horizon/manage.pyc
@@ -4904,6 +3066,931 @@ cp horizon.conf %{buildroot}/usr/share/defaults/httpd/conf.d
 /usr/share/httpd/horizon/openstack_dashboard/views.pyc
 /usr/share/httpd/horizon/openstack_dashboard/views.pyo
 /usr/share/httpd/horizon/openstack_dashboard/wsgi/django.wsgi
+/usr/share/httpd/horizon/static/angular/action-list/action-list.js
+/usr/share/httpd/horizon/static/angular/action-list/action-list.scss
+/usr/share/httpd/horizon/static/angular/action-list/action-list.spec.js
+/usr/share/httpd/horizon/static/angular/action-list/action.html
+/usr/share/httpd/horizon/static/angular/action-list/button-tooltip.js
+/usr/share/httpd/horizon/static/angular/action-list/menu-item.html
+/usr/share/httpd/horizon/static/angular/action-list/menu.html
+/usr/share/httpd/horizon/static/angular/action-list/single-button.html
+/usr/share/httpd/horizon/static/angular/action-list/split-button.html
+/usr/share/httpd/horizon/static/angular/action-list/warning-tooltip.html
+/usr/share/httpd/horizon/static/angular/bind-scope/bind-scope.js
+/usr/share/httpd/horizon/static/angular/bind-scope/bind-scope.spec.js
+/usr/share/httpd/horizon/static/angular/charts/chart-tooltip.html
+/usr/share/httpd/horizon/static/angular/charts/chart-tooltip.js
+/usr/share/httpd/horizon/static/angular/charts/chart-tooltip.scss
+/usr/share/httpd/horizon/static/angular/charts/charts.js
+/usr/share/httpd/horizon/static/angular/charts/pie-chart.html
+/usr/share/httpd/horizon/static/angular/charts/pie-chart.js
+/usr/share/httpd/horizon/static/angular/charts/pie-chart.scss
+/usr/share/httpd/horizon/static/angular/charts/pie-chart.spec.js
+/usr/share/httpd/horizon/static/angular/form/form.js
+/usr/share/httpd/horizon/static/angular/form/form.spec.js
+/usr/share/httpd/horizon/static/angular/help-panel/help-panel.html
+/usr/share/httpd/horizon/static/angular/help-panel/help-panel.js
+/usr/share/httpd/horizon/static/angular/help-panel/help-panel.scss
+/usr/share/httpd/horizon/static/angular/help-panel/help-panel.spec.js
+/usr/share/httpd/horizon/static/angular/login/login.js
+/usr/share/httpd/horizon/static/angular/login/login.spec.js
+/usr/share/httpd/horizon/static/angular/magic-search/magic-search.html
+/usr/share/httpd/horizon/static/angular/magic-search/magic-search.js
+/usr/share/httpd/horizon/static/angular/magic-search/magic-search.scss
+/usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.html
+/usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.js
+/usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.scss
+/usr/share/httpd/horizon/static/angular/metadata-display/metadata-display.spec.js
+/usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree-item.html
+/usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree-service.js
+/usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.html
+/usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.js
+/usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.scss
+/usr/share/httpd/horizon/static/angular/metadata-tree/metadata-tree.spec.js
+/usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.js
+/usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.scss
+/usr/share/httpd/horizon/static/angular/modal/modal-wait-spinner.spec.js
+/usr/share/httpd/horizon/static/angular/modal/modal.js
+/usr/share/httpd/horizon/static/angular/modal/modal.spec.js
+/usr/share/httpd/horizon/static/angular/modal/simple-modal.html
+/usr/share/httpd/horizon/static/angular/styles.scss
+/usr/share/httpd/horizon/static/angular/table/basic-table.js
+/usr/share/httpd/horizon/static/angular/table/basic-table.spec.js
+/usr/share/httpd/horizon/static/angular/table/search-bar.html
+/usr/share/httpd/horizon/static/angular/table/table.js
+/usr/share/httpd/horizon/static/angular/table/table.scss
+/usr/share/httpd/horizon/static/angular/table/table.spec.js
+/usr/share/httpd/horizon/static/angular/transfer-table/allocated.html.example
+/usr/share/httpd/horizon/static/angular/transfer-table/available.html.example
+/usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.html
+/usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.js
+/usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.scss
+/usr/share/httpd/horizon/static/angular/transfer-table/transfer-table.spec.js
+/usr/share/httpd/horizon/static/angular/validators/validators.js
+/usr/share/httpd/horizon/static/angular/validators/validators.spec.js
+/usr/share/httpd/horizon/static/angular/widget.module.js
+/usr/share/httpd/horizon/static/angular/wizard/wizard.html
+/usr/share/httpd/horizon/static/angular/wizard/wizard.js
+/usr/share/httpd/horizon/static/angular/wizard/wizard.scss
+/usr/share/httpd/horizon/static/angular/wizard/wizard.spec.js
+/usr/share/httpd/horizon/static/angular/workflow/workflow.js
+/usr/share/httpd/horizon/static/angular/workflow/workflow.spec.js
+/usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.eot
+/usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.svg
+/usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.ttf
+/usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.woff
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap-sprockets.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/affix.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/alert.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/button.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/carousel.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/collapse.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/dropdown.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/modal.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/popover.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/scrollspy.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/tab.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/tooltip.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap/transition.js
+/usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-compass.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-mincer.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-sprockets.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_alerts.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_badges.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_breadcrumbs.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_button-groups.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_buttons.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_carousel.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_close.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_code.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_component-animations.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_dropdowns.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_forms.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_glyphicons.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_grid.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_input-groups.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_jumbotron.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_labels.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_list-group.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_media.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_mixins.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_modals.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_navbar.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_navs.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_normalize.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_pager.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_pagination.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_panels.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_popovers.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_print.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_progress-bars.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_responsive-embed.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_responsive-utilities.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_scaffolding.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_tables.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_theme.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_thumbnails.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_tooltip.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_type.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_utilities.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_variables.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_wells.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/bootstrap.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_alerts.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_background-variant.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_border-radius.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_buttons.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_center-block.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_clearfix.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_forms.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_gradients.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_grid-framework.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_grid.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_hide-text.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_image.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_labels.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_list-group.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_nav-divider.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_nav-vertical-align.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_opacity.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_pagination.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_panels.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_progress-bar.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_reset-filter.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_resize.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_responsive-visibility.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_size.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_tab-focus.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_table-row.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_text-emphasis.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_text-overflow.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_vendor-prefixes.scss
+/usr/share/httpd/horizon/static/custom/_styles.scss
+/usr/share/httpd/horizon/static/custom/_variables.scss
+/usr/share/httpd/horizon/static/dashboard/cloud-services/cloud-services.js
+/usr/share/httpd/horizon/static/dashboard/cloud-services/cloud-services.spec.js
+/usr/share/httpd/horizon/static/dashboard/css/7d1b410b86cf.css
+/usr/share/httpd/horizon/static/dashboard/css/d7fc3590f4a6.css
+/usr/share/httpd/horizon/static/dashboard/dashboard.module.js
+/usr/share/httpd/horizon/static/dashboard/dashboard.module.spec.js
+/usr/share/httpd/horizon/static/dashboard/dashboard.scss
+/usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.eot
+/usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.svg
+/usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.ttf
+/usr/share/httpd/horizon/static/dashboard/fonts/Anivers_Regular-webfont.woff
+/usr/share/httpd/horizon/static/dashboard/img/action_required.png
+/usr/share/httpd/horizon/static/dashboard/img/db-gray.gif
+/usr/share/httpd/horizon/static/dashboard/img/db-gray.svg
+/usr/share/httpd/horizon/static/dashboard/img/db-green.svg
+/usr/share/httpd/horizon/static/dashboard/img/db-red.svg
+/usr/share/httpd/horizon/static/dashboard/img/drag.png
+/usr/share/httpd/horizon/static/dashboard/img/drop_arrow.png
+/usr/share/httpd/horizon/static/dashboard/img/favicon.ico
+/usr/share/httpd/horizon/static/dashboard/img/lb-gray.gif
+/usr/share/httpd/horizon/static/dashboard/img/lb-gray.svg
+/usr/share/httpd/horizon/static/dashboard/img/lb-green.svg
+/usr/share/httpd/horizon/static/dashboard/img/lb-red.svg
+/usr/share/httpd/horizon/static/dashboard/img/loading.gif
+/usr/share/httpd/horizon/static/dashboard/img/logo-splash.png
+/usr/share/httpd/horizon/static/dashboard/img/logo.png
+/usr/share/httpd/horizon/static/dashboard/img/profile_drop.png
+/usr/share/httpd/horizon/static/dashboard/img/right_droparrow.png
+/usr/share/httpd/horizon/static/dashboard/img/router.png
+/usr/share/httpd/horizon/static/dashboard/img/search.png
+/usr/share/httpd/horizon/static/dashboard/img/server-gray.gif
+/usr/share/httpd/horizon/static/dashboard/img/server-gray.svg
+/usr/share/httpd/horizon/static/dashboard/img/server-green.svg
+/usr/share/httpd/horizon/static/dashboard/img/server-red.svg
+/usr/share/httpd/horizon/static/dashboard/img/server.png
+/usr/share/httpd/horizon/static/dashboard/img/sidebar_bg.png
+/usr/share/httpd/horizon/static/dashboard/img/spinner.gif
+/usr/share/httpd/horizon/static/dashboard/img/stack-gray.gif
+/usr/share/httpd/horizon/static/dashboard/img/stack-gray.svg
+/usr/share/httpd/horizon/static/dashboard/img/stack-green.svg
+/usr/share/httpd/horizon/static/dashboard/img/stack-red.svg
+/usr/share/httpd/horizon/static/dashboard/img/unknown-gray.gif
+/usr/share/httpd/horizon/static/dashboard/img/unknown-gray.svg
+/usr/share/httpd/horizon/static/dashboard/img/unknown-green.svg
+/usr/share/httpd/horizon/static/dashboard/img/unknown-red.svg
+/usr/share/httpd/horizon/static/dashboard/img/up_arrow.png
+/usr/share/httpd/horizon/static/dashboard/js/76407d7f5aff.js
+/usr/share/httpd/horizon/static/dashboard/js/76adef98ad14.js
+/usr/share/httpd/horizon/static/dashboard/js/87acf9c3aa9c.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.help.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/configuration.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/load-edit.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/configuration/load-edit.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.help.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/flavor.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/select-flavor-table.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/flavor/select-flavor-table.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/create-keypair.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/import-keypair.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair-details.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.help.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/keypair.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/keypair/new-keypair.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.model.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.model.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/launch-instance.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.help.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/network/network.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/keypair-details.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-group-details.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.help.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/security-groups/security-groups.spec.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/source/source-details.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.help.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.html
+/usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.js
+/usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.scss
+/usr/share/httpd/horizon/static/dashboard/launch-instance/source/source.spec.js
+/usr/share/httpd/horizon/static/dashboard/manifest.json
+/usr/share/httpd/horizon/static/dashboard/scss/_mixins.scss
+/usr/share/httpd/horizon/static/dashboard/scss/_splash.scss
+/usr/share/httpd/horizon/static/dashboard/scss/_variables.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_accordion_nav.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_charts.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_inline_edit.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_network_topology.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_resource_browser.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_topbar.scss
+/usr/share/httpd/horizon/static/dashboard/scss/components/_workflow.scss
+/usr/share/httpd/horizon/static/dashboard/scss/horizon.scss
+/usr/share/httpd/horizon/static/dashboard/scss/serial_console.css
+/usr/share/httpd/horizon/static/dashboard/workflow/workflow.js
+/usr/share/httpd/horizon/static/dashboard/workflow/workflow.spec.js
+/usr/share/httpd/horizon/static/horizon/js/angular/controllers/dummy.js
+/usr/share/httpd/horizon/static/horizon/js/angular/controllers/modal-form-update-metadata-ctrl.js
+/usr/share/httpd/horizon/static/horizon/js/angular/controllers/namespace-controller.js
+/usr/share/httpd/horizon/static/horizon/js/angular/directives/forms.js
+/usr/share/httpd/horizon/static/horizon/js/angular/directives/serialConsole.js
+/usr/share/httpd/horizon/static/horizon/js/angular/filters/filters.js
+/usr/share/httpd/horizon/static/horizon/js/angular/filters/filters.spec.js
+/usr/share/httpd/horizon/static/horizon/js/angular/horizon.conf.js
+/usr/share/httpd/horizon/static/horizon/js/angular/horizon.js
+/usr/share/httpd/horizon/static/horizon/js/angular/hz.api.module.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/horizon.utils.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.cinder.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.config.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.config.spec.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.glance.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.keystone.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.neutron.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.nova.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.policy.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.security-group.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.service.js
+/usr/share/httpd/horizon/static/horizon/js/angular/services/hz.api.service.spec.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.accordion_nav.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.communication.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.d3barchart.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.d3linechart.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.d3piechart.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.datepickers.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.firewalls.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.forms.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.formset_table.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.heattop.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.images.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.instances.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.membership.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.messages.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.metering.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.modals.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.networktopology.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.quota.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.tables.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.tables_inline_edit.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.tabs.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.templates.js
+/usr/share/httpd/horizon/static/horizon/js/horizon.users.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-animate.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-aria.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-bootstrap.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-cookies.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-csp.css
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-loader.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-messages.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-mocks.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-resource.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-route.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-sanitize.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-scenario.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular-touch.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/angular.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/errors.json
+/usr/share/httpd/horizon/static/horizon/lib/angular/lrdragndrop.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/smart-table.js
+/usr/share/httpd/horizon/static/horizon/lib/angular/version.json
+/usr/share/httpd/horizon/static/horizon/lib/angular/version.txt
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/bootstrap-datepicker.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/datepicker.css
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/datepicker3.css
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ar.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.az.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.bg.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ca.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.cs.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.cy.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.da.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.de.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.el.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.es.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.et.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fa.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fi.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.fr.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.gl.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.he.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.hr.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.hu.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.id.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.is.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.it.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ja.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ka.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.kk.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.kr.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.lt.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.lv.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.mk.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ms.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nb.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nl-BE.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.nl.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.no.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pl.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pt-BR.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.pt.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ro.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.rs-latin.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.rs.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ru.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sk.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sl.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sq.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sv.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.sw.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.th.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.tr.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.ua.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.vi.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-CN.js
+/usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-TW.js
+/usr/share/httpd/horizon/static/horizon/lib/d3.js
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.css
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.css.map
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/css/font-awesome.min.css
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/FontAwesome.otf
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.eot
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.svg
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.ttf
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.woff
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/fonts/fontawesome-webfont.woff2
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/animated.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/bordered-pulled.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/core.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/fixed-width.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/font-awesome.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/icons.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/larger.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/list.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/mixins.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/path.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/rotated-flipped.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/stacked.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/less/variables.less
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_animated.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_bordered-pulled.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_core.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_fixed-width.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_icons.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_larger.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_list.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_mixins.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_path.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_rotated-flipped.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_stacked.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/_variables.scss
+/usr/share/httpd/horizon/static/horizon/lib/font-awesome/scss/font-awesome.scss
+/usr/share/httpd/horizon/static/horizon/lib/hogan.js
+/usr/share/httpd/horizon/static/horizon/lib/jasmine/boot.js
+/usr/share/httpd/horizon/static/horizon/lib/jasmine/console.js
+/usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine-html.js
+/usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine.css
+/usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine.js
+/usr/share/httpd/horizon/static/horizon/lib/jasmine/jasmine_favicon.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_diagonals-thick_18_b81900_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_diagonals-thick_20_666666_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_flat_10_000000_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_100_f6f6f6_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_100_fdf5ce_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_glass_65_ffffff_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_gloss-wave_35_f6a828_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_highlight-soft_100_eeeeee_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-bg_highlight-soft_75_ffe45c_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_228ef1_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ef8c08_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ffd27a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.min.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.structure.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.structure.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/jquery-ui.theme.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_diagonals-thick_8_333333_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_flat_65_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_glass_40_111111_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_glass_55_1c1c1c_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-hard_100_f9f9f9_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-hard_40_aaaaaa_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_highlight-soft_50_aaaaaa_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_inset-hard_45_cd0a0a_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-bg_inset-hard_55_ffeb80_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_4ca300_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_bbbbbb_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ededed_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ffcf29_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/black-tie/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_diagonals-thick_75_f3d8d8_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_dots-small_65_a6a6a6_2x2.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_0_333333_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_65_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_flat_75_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_glass_55_fbf8ee_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-hard_100_eeeeee_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-hard_100_f6f6f6_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-bg_highlight-soft_15_cc0000_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_004276_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_cc0000_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/blitzer/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_100_e4f1fb_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-soft_100_deedf7_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-bg_highlight-soft_25_ffef8f_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_2694e8_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_2e83ff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_3d80b3_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_72a7cf_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/cupertino/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_flat_30_cccccc_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_flat_50_5c5c5c_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_glass_40_ffc73d_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-hard_20_0972a5_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_33_003147_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_35_222222_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_44_444444_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-bg_loop_25_000000_21x21.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_4b8e0b_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_a83300_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_cccccc_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dark-hive/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_diagonals-thick_15_0b3e6f_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-medium_30_0b58a2_4x4.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_20_333333_2x2.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_30_a32d00_2x2.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_dots-small_40_00498f_2x2.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_flat_40_292929_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-bg_gloss-wave_20_111111_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_00498f_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_98d2fb_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_9ccdfc_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/dot-luv/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_0_eeeeee_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_55_994d53_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_flat_55_fafafa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_gloss-wave_30_3d3644_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_100_dcd9de_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_100_eae6ea_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_25_30273a_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-bg_highlight-soft_45_5f5964_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_454545_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_734d99_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_8d78a5_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_a8a3ae_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_ebccce_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/eggplant/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-small_25_c5ddfc_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_22_1484e6_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_diagonals-thick_26_2293f7_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_flat_0_e69700_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_flat_0_e6b900_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_highlight-soft_100_f9f9f9_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-bg_inset-hard_100_eeeeee_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_0a82eb_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_0b54d5_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_5fa5e3_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_fcdd4a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/excite-bike/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_0_eeeeee_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_55_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_flat_75_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_glass_65_ffffff_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_100_f6f6f6_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_25_0073ea_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-bg_highlight-soft_50_dddddd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_0073ea_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_454545_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_666666_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_ff0084_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/flick/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_40_db4865_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_50_93c3cd_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_50_ff3853_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_diagonals-small_75_ccd232_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_dots-medium_80_ffff38_4x4.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_dots-small_35_35414f_2x2.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_flat_75_ba9217_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_flat_75_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-bg_white-lines_85_f7f7ba_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_454545_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_88a206_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_c02669_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_e1e463_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_ffeb33_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/hot-sneaks/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_flat_75_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_100_f5f0e5_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_25_cb842e_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_glass_70_ede4d4_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_100_f4f0ec_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_65_fee4bd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_highlight-hard_75_f5f5b5_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-bg_inset-soft_100_f4f0ec_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_c47a23_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_cb672b_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_f08000_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_f35f07_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_ff7519_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/humanity/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-small_0_aaaaaa_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-thick_15_444444_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_diagonals-thick_95_ffdc2e_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_glass_55_fbf5d0_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-hard_30_285c00_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_33_3a8104_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_50_4eb305_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_highlight-soft_60_4ca20b_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-bg_inset-soft_10_285c00_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_4eb305_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_72b42d_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_cd0a0a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/le-frog/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_glass_15_5f391b_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_20_1c160d_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_25_453326_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_gloss-wave_30_44372c_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_highlight-soft_20_201913_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_highlight-soft_20_619226_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-bg_inset-soft_10_201913_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_9bcc60_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_add978_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_e3ddc9_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_f1fd86_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/mint-choc/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_0_eeeeee_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_55_c0402a_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_flat_55_eeeeee_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_100_f8f8f8_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_35_dddddd_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_glass_60_eeeeee_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_inset-hard_75_999999_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-bg_inset-soft_50_c9c9c9_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_3383bb_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_454545_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_70b2e1_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_999999_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/images/ui-icons_fbc856_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/overcast/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_diagonal-maze_20_6e4f1c_10x10.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_diagonal-maze_40_000000_10x10.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_10_f8f7f6_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_eceadf_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_f7f3de_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_15_ffffff_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_65_654b24_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-bg_fine-grain_68_b83400_60x60.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_3572ac_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_8c291d_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_b83400_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_fbdb93_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/pepper-grinder/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_flat_55_fbec88_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_75_d0e5f5_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_85_dfeffc_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_glass_95_fef1ec_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_gloss-wave_55_5c9ccc_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_inset-hard_100_f5f8f9_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-bg_inset-hard_100_fcfdfd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_217bc0_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_2e83ff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_469bdd_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_6da8d5_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_cd0a0a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_d8e7f3_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/images/ui-icons_f9bd01_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/redmond/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_flat_75_ffffff_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_55_fbf9ee_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_glass_95_fef1ec_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-bg_highlight-soft_75_cccccc_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_2e83ff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_454545_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_888888_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/images/ui-icons_cd0a0a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/smoothness/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_glass_55_fcf0ba_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_gloss-wave_100_ece8da_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_100_f5f3e5_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_100_fafaf4_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_15_459e00_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-hard_95_cccccc_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-soft_25_67b021_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_highlight-soft_95_ffedad_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-bg_inset-soft_15_2b2922_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_808080_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_847e71_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_8DC262_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_cd0a0a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_eeeeee_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/south-street/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_flat_55_999999_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_flat_75_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_45_0078ae_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_55_f8da4e_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_glass_75_79c9ec_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_45_e14f1c_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_50_6eac2c_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_gloss-wave_75_2191c0_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-bg_inset-hard_100_fcfdfd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_0078ae_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_056b93_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_d8e7f3_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_e0fdff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_f5e175_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_f7a50d_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/images/ui-icons_fcd113_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/start/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_diagonals-medium_20_d34d17_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_flat_30_cccccc_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_flat_50_5c5c5c_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_45_817865_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_60_fece2f_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_gloss-wave_90_fff9e5_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_highlight-soft_100_feeebd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-bg_inset-soft_30_ffffff_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_3d3d3d_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_bd7b00_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_d19405_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_eb990f_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_ed9f26_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_fadc7a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/images/ui-icons_ffe180_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/sunny/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_10_4f4221_10x8.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_20_372806_10x8.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_25_675423_10x8.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_25_d5ac5d_10x8.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_8_261803_10x8.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_diamond_8_443113_10x8.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_flat_75_ddd4b0_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-bg_highlight-hard_65_fee4bd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_070603_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_e8e2b5_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_e9cd86_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_efec9f_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_f2ec64_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_f9f2bd_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/images/ui-icons_ff7519_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/swanky-purse/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_diagonals-small_50_262626_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_flat_0_303030_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_flat_0_4c4c4c_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_40_0a0a0a_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_55_f1fbe5_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_glass_60_000000_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_85_9fda58_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-bg_gloss-wave_95_f6ecd5_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_000000_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_1f1f1f_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_9fda58_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_b8ec79_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_cd0a0a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/trontastic/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_flat_30_cccccc_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_flat_50_5c5c5c_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_20_555555_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_40_0078a3_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_glass_40_ffc73d_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_gloss-wave_25_333333_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_inset-soft_25_000000_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-bg_inset-soft_30_f58400_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_4b8e0b_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_a83300_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_cccccc_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-darkness/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_flat_10_000000_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_222222_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_228ef1_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ef8c08_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ffd27a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/images/ui-icons_ffffff_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/ui-lightness/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/animated-overlay.gif
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_flat_0_aaaaaa_40x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_glass_95_fef1ec_1x400.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_gloss-wave_16_121212_500x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-hard_15_888888_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-hard_55_555555_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-soft_35_adadad_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_highlight-soft_60_dddddd_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-bg_inset-soft_15_121212_1x100.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_666666_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_aaaaaa_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_bbbbbb_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_c98000_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_cccccc_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_cd0a0a_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/images/ui-icons_f29a00_256x240.png
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/jquery-ui.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/jquery-ui.min.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery-ui/ui/themes/vader/theme.css
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery-migrate.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery-migrate.min.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.bootstrap.wizard.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.min.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.quicksearch.js
+/usr/share/httpd/horizon/static/horizon/lib/jquery/jquery.tablesorter.js
+/usr/share/httpd/horizon/static/horizon/lib/jsencrypt/jsencrypt.js
+/usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.html
+/usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.js
+/usr/share/httpd/horizon/static/horizon/lib/magic_search/magic_search.scss
+/usr/share/httpd/horizon/static/horizon/lib/qunit/qunit.css
+/usr/share/httpd/horizon/static/horizon/lib/qunit/qunit.js
+/usr/share/httpd/horizon/static/horizon/lib/rickshaw.css
+/usr/share/httpd/horizon/static/horizon/lib/rickshaw.js
+/usr/share/httpd/horizon/static/horizon/lib/spin.jquery.js
+/usr/share/httpd/horizon/static/horizon/lib/spin.js
+/usr/share/httpd/horizon/static/horizon/lib/term.js
+/usr/share/httpd/horizon/static/horizon/tests/instances.js
+/usr/share/httpd/horizon/static/horizon/tests/jasmine/utils.spec.js
+/usr/share/httpd/horizon/static/horizon/tests/messages.js
+/usr/share/httpd/horizon/static/horizon/tests/modals.js
+/usr/share/httpd/horizon/static/horizon/tests/tables.js
+/usr/share/httpd/horizon/static/horizon/tests/templates.js
+/usr/share/httpd/horizon/static/themes/blue/_styles.scss
+/usr/share/httpd/horizon/static/themes/blue/_variables.scss
+/usr/share/httpd/horizon/static/themes/default/_styles.scss
+/usr/share/httpd/horizon/static/themes/default/_variables.scss
+/usr/share/httpd/horizon/static/themes/webroot/_styles.scss
+/usr/share/httpd/horizon/static/themes/webroot/_variables.scss
 
 %files python
 %defattr(-,root,root,-)
