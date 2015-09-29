@@ -22,6 +22,7 @@ extras
 extras-python
 fixtures-python
 flake8-python
+funcsigs-python
 futures-python
 greenlet-python
 hacking-python
@@ -54,6 +55,7 @@ oslo.i18n
 oslo.serialization
 oslosphinx-python
 oslo.utils
+pathlib-python
 pbr
 pbr-python
 pep8-python
@@ -100,6 +102,7 @@ testtools-python
 traceback2-python
 unittest2-python
 warlock-python
+wrapt-python
 XStatic
 XStatic-Angular
 XStatic-Angular-Bootstrap
