@@ -1,26 +1,27 @@
-From 5e7b87db65b42c1085c7f61bfa2e9491cf5d84c8 Mon Sep 17 00:00:00 2001
-From: Alberto Murillo <alberto.murillo.silva@intel.com>
-Date: Mon, 6 Jul 2015 11:24:41 -0500
+From 487a4598a051448023595297ad119f7477e640bc Mon Sep 17 00:00:00 2001
+From: Victor Morales <victor.morales@intel.com>
+Date: Thu, 1 Oct 2015 11:16:07 -0500
 Subject: [PATCH] default config
 
+Signed-off-by: Victor Morales <victor.morales@intel.com>
 ---
- .../local/local_settings.py.example                | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ openstack_dashboard/local/local_settings.py.example | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
 diff --git a/openstack_dashboard/local/local_settings.py.example b/openstack_dashboard/local/local_settings.py.example
-index 569cf21..87cca8b 100644
+index e53ee35..9cee054 100644
 --- a/openstack_dashboard/local/local_settings.py.example
 +++ b/openstack_dashboard/local/local_settings.py.example
-@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
- 
+@@ -7,7 +7,7 @@ from horizon.utils import secret_key
  from openstack_dashboard import exceptions
+ from openstack_dashboard.settings import HORIZON_CONFIG
  
 -DEBUG = True
 +DEBUG = False
  TEMPLATE_DEBUG = DEBUG
  
  
-@@ -25,7 +25,7 @@ WEBROOT = '/'
+@@ -27,7 +27,7 @@ WEBROOT = '/'
  # with the list of host/domain names that the application can serve.
  # For more information see:
  # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
@@ -29,7 +30,7 @@ index 569cf21..87cca8b 100644
  
  # Set SSL proxy settings:
  # For Django 1.4+ pass this header from the proxy after terminating the SSL,
-@@ -101,7 +101,7 @@ HORIZON_CONFIG = {
+@@ -90,7 +90,7 @@ WEBROOT = '/'
  # including on the login form.
  #HORIZON_CONFIG["disable_password_reveal"] = False
  
@@ -38,7 +39,7 @@ index 569cf21..87cca8b 100644
  
  # Set custom secret key:
  # You can either set it to a specific value or you can let horizon generate a
-@@ -119,19 +119,19 @@ SECRET_KEY = secret_key.generate_or_read_from_file(
+@@ -107,16 +107,10 @@ SECRET_KEY = secret_key.generate_or_read_from_file(
  # We recommend you use memcached for development; otherwise after every reload
  # of the django development server, you will have to login again. To use
  # memcached set CACHES to something like
@@ -57,15 +58,6 @@ index 569cf21..87cca8b 100644
      }
  }
  
-+# CACHES = {
-+#    'default': {
-+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-+#    }
-+#}
-+
- # Send email to the console by default
- EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
- # Or send them to /dev/null
 -- 
 2.1.0
 

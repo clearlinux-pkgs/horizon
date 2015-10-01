@@ -1,27 +1,42 @@
-Index: horizon-2015.1.1/horizon-nginx.conf
-===================================================================
+From 30d4a34e81bfb8e9381354333486f625b3804e1b Mon Sep 17 00:00:00 2001
+From: Victor Morales <victor.morales@intel.com>
+Date: Thu, 1 Oct 2015 10:57:30 -0500
+Subject: [PATCH] nginx uwsgi
+
+Signed-off-by: Victor Morales <victor.morales@intel.com>
+---
+ horizon-nginx.conf | 15 +++++++++++++++
+ horizon.ini        |  8 ++++++++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 horizon-nginx.conf
+ create mode 100644 horizon.ini
+
+diff --git a/horizon-nginx.conf b/horizon-nginx.conf
+new file mode 100644
+index 0000000..b828b34
 --- /dev/null
-+++ horizon-2015.1.1/horizon-nginx.conf
++++ b/horizon-nginx.conf
 @@ -0,0 +1,15 @@
 +server {
-+       listen 80;
-+       server_name localhost;
-+       location / {
-+              root /usr/share/httpd/horizon/;
-+	      try_files $uri @horizon;
-+	    }
-+	location @horizon {
-+	include uwsgi_params;
-+	uwsgi_pass unix:/run/uwsgi/horizon.sock;
-+	}
-+	location /static {
-+	alias /usr/share/httpd/horizon/static/;
-+	}
++    listen 80;
++    server_name localhost;
++    location / {
++        root /usr/share/httpd/horizon/;
++        try_files $uri @horizon;
++    }
++    location @horizon {
++        include uwsgi_params;
++        uwsgi_pass unix:/run/uwsgi/horizon.sock;
++    }
++    location /static {
++        alias /usr/share/httpd/horizon/static/;
++    }
 +}
-Index: horizon-2015.1.1/horizon.ini
-===================================================================
+diff --git a/horizon.ini b/horizon.ini
+new file mode 100644
+index 0000000..b85bd7e
 --- /dev/null
-+++ horizon-2015.1.1/horizon.ini
++++ b/horizon.ini
 @@ -0,0 +1,8 @@
 +[uwsgi]
 +master = true
@@ -31,3 +46,6 @@ Index: horizon-2015.1.1/horizon.ini
 +wsgi-file = wsgi/django.wsgi
 +uid = httpd
 +gid = httpd
+-- 
+2.1.0
+
