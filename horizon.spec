@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 2015.1.1
-Release  : 25
+Release  : 27
 URL      : http://tarballs.openstack.org/horizon/horizon-2015.1.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-2015.1.1.tar.gz
 Summary  : OpenStack Dashboard
@@ -147,6 +147,7 @@ Patch4: oslo_config.patch
 Patch5: oslo_serialization.patch
 Patch6: oslo_i18n.patch
 Patch7: cca93ade7c23c1f2794376161b6660a459292eee.patch
+Patch8: nginx-uwsgi.patch
 
 %description
 =============================
@@ -189,6 +190,7 @@ python components for the horizon package.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
 %build
 python2 setup.py build -b py2
@@ -216,6 +218,10 @@ cp -a horizon/static/* %{buildroot}/usr/share/httpd/horizon/static
 rm %{buildroot}/usr/share/httpd/horizon/openstack_dashboard/local/local_settings.pyc || :
 install -m 0755 -d %{buildroot}/usr/share/defaults/httpd/conf.d
 cp horizon.conf %{buildroot}/usr/share/defaults/httpd/conf.d
+install -m 0755 -d %{buildroot}/usr/share/uwsgi
+cp horizon.ini %{buildroot}/usr/share/uwsgi
+install -m 0755 -d %{buildroot}/usr/share/nginx/conf.d
+cp horizon-nginx.conf %{buildroot}/usr/share/nginx/conf.d
 ## make_install_append end
 
 %post data
@@ -3991,6 +3997,8 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/themes/default/_variables.scss
 /usr/share/httpd/horizon/static/themes/webroot/_styles.scss
 /usr/share/httpd/horizon/static/themes/webroot/_variables.scss
+/usr/share/nginx/conf.d/horizon-nginx.conf
+/usr/share/uwsgi/horizon.ini
 
 %files python
 %defattr(-,root,root,-)

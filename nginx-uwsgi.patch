@@ -1,0 +1,33 @@
+Index: horizon-2015.1.1/horizon-nginx.conf
+===================================================================
+--- /dev/null
++++ horizon-2015.1.1/horizon-nginx.conf
+@@ -0,0 +1,15 @@
++server {
++       listen 80;
++       server_name localhost;
++       location / {
++              root /usr/share/httpd/horizon/;
++	      try_files $uri @horizon;
++	    }
++	location @horizon {
++	include uwsgi_params;
++	uwsgi_pass unix:/run/uwsgi/horizon.sock;
++	}
++	location /static {
++	alias /usr/share/httpd/horizon/static/;
++	}
++}
+Index: horizon-2015.1.1/horizon.ini
+===================================================================
+--- /dev/null
++++ horizon-2015.1.1/horizon.ini
+@@ -0,0 +1,8 @@
++[uwsgi]
++master = true
++processes = 3
++threads = 10
++chdir = /usr/share/httpd/horizon/openstack_dashboard/
++wsgi-file = wsgi/django.wsgi
++uid = httpd
++gid = httpd
