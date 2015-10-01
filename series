@@ -1,8 +1,2 @@
 0001-enable-dashboard-in-apache.patch
-0002-default-config.patch
-0001-Replace-memoized-for-another-solution.patch
-oslo_config.patch
-oslo_serialization.patch
-oslo_i18n.patch
-cca93ade7c23c1f2794376161b6660a459292eee.patch
-nginx-uwsgi.patch
+0002-nginx-uwsgi.patch
