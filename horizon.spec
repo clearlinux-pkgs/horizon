@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 8.0.0.0rc1
-Release  : 28
+Release  : 29
 URL      : http://tarballs.openstack.org/horizon/horizon-8.0.0.0rc1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-8.0.0.0rc1.tar.gz
 Summary  : OpenStack Dashboard
@@ -81,6 +81,8 @@ BuildRequires : setuptools
 BuildRequires : six
 Patch1: 0001-enable-dashboard-in-apache.patch
 Patch2: 0002-nginx-uwsgi.patch
+Patch3: 0003-default-config.patch
+Patch4: 0004-Replace-memoized-for-another-solution.patch
 
 %description
 =============================
@@ -110,6 +112,8 @@ python components for the horizon package.
 %setup -q -n horizon-8.0.0.0rc1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 
 %build
 python2 setup.py build -b py2
@@ -2727,11 +2731,9 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/openstack_dashboard/hooks.pyc
 /usr/share/httpd/horizon/openstack_dashboard/hooks.pyo
 /usr/share/httpd/horizon/openstack_dashboard/karma.conf.js
-/usr/share/httpd/horizon/openstack_dashboard/local/.secret_key_store
 /usr/share/httpd/horizon/openstack_dashboard/local/__init__.py
 /usr/share/httpd/horizon/openstack_dashboard/local/__init__.pyc
 /usr/share/httpd/horizon/openstack_dashboard/local/__init__.pyo
-/usr/share/httpd/horizon/openstack_dashboard/local/_builddir_build_BUILDROOT_horizon-8.0.0.0rc1-28.x86_64_usr_share_httpd_horizon_openstack_dashboard_local_.secret_key_store.lock
 /usr/share/httpd/horizon/openstack_dashboard/local/enabled/_50_settings.py.example
 /usr/share/httpd/horizon/openstack_dashboard/local/enabled/__init__.py
 /usr/share/httpd/horizon/openstack_dashboard/local/enabled/__init__.pyc
