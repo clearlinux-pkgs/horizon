@@ -5,3 +5,4 @@ oslo_config.patch
 oslo_serialization.patch
 oslo_i18n.patch
 cca93ade7c23c1f2794376161b6660a459292eee.patch
+nginx-uwsgi.patch
