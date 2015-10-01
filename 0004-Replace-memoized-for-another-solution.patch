@@ -1,7 +1,7 @@
-From c6c73420bb081f71d3d582c49b106aabf046f253 Mon Sep 17 00:00:00 2001
+From dcb2d91cb7889249829f2f9e14bd5af36e841fb0 Mon Sep 17 00:00:00 2001
 From: William Douglas <william.douglas@intel.com>
 Date: Tue, 15 Sep 2015 16:12:22 -0700
-Subject: [PATCH] Replace memoized for another solution
+Subject: [PATCH 3/3] Replace memoized for another solution
 
 memoized seemed to be ineffective for handling cases where we don't care
 about the exact object matching but only key fields. Try another
@@ -12,12 +12,12 @@ custom key creation functions to allow per function being memoized key selection
  1 file changed, 78 insertions(+), 5 deletions(-)
 
 diff --git a/openstack_dashboard/api/nova.py b/openstack_dashboard/api/nova.py
-index c84c519..67c3423 100644
+index 01d075c..7de0696 100644
 --- a/openstack_dashboard/api/nova.py
 +++ b/openstack_dashboard/api/nova.py
-@@ -41,6 +41,52 @@ from horizon.utils.memoized import memoized  # noqa
- from openstack_dashboard.api import base
+@@ -43,6 +43,52 @@ from openstack_dashboard.api import base
  from openstack_dashboard.api import network_base
+ 
  
 +import functools
 +import time
@@ -65,10 +65,10 @@ index c84c519..67c3423 100644
 +        return wrapped
 +    return wrapper
 +
- 
  LOG = logging.getLogger(__name__)
  
-@@ -435,7 +481,15 @@ class FloatingIpManager(network_base.FloatingIpManager):
+ 
+@@ -441,7 +487,15 @@ class FloatingIpManager(network_base.FloatingIpManager):
          return True
  
  
@@ -85,7 +85,7 @@ index c84c519..67c3423 100644
  def novaclient(request):
      insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
      cacert = getattr(settings, 'OPENSTACK_SSL_CACERT', None)
-@@ -493,7 +547,14 @@ def flavor_get(request, flavor_id, get_extras=False):
+@@ -499,7 +553,14 @@ def flavor_get(request, flavor_id, get_extras=False):
      return flavor
  
  
@@ -101,7 +101,7 @@ index c84c519..67c3423 100644
  def flavor_list(request, is_public=True, get_extras=False):
      """Get the list of available instance sizes (flavors)."""
      flavors = novaclient(request).flavors.list(is_public=is_public)
-@@ -503,7 +564,13 @@ def flavor_list(request, is_public=True, get_extras=False):
+@@ -509,7 +570,13 @@ def flavor_list(request, is_public=True, get_extras=False):
      return flavors
  
  
@@ -116,14 +116,17 @@ index c84c519..67c3423 100644
  def flavor_access_list(request, flavor=None):
      """Get the list of access instance sizes (flavors)."""
      return novaclient(request).flavor_access.list(flavor=flavor)
-@@ -917,12 +984,18 @@ def remove_host_from_aggregate(request, aggregate_id, host):
-     return novaclient(request).aggregates.remove_host(aggregate_id, host)
+@@ -943,7 +1010,7 @@ def interface_detach(request, server, port_id):
+     return novaclient(request).servers.interface_detach(server, port_id)
  
  
 -@memoized
 +@memoize(get_key=novaclient_memo_key)
  def list_extensions(request):
-     return nova_list_extensions.ListExtManager(novaclient(request)).show_all()
+     """List all nova extensions, except the ones in the blacklist."""
+ 
+@@ -956,7 +1023,13 @@ def list_extensions(request):
+     ]
  
  
 -@memoized
@@ -138,5 +141,5 @@ index c84c519..67c3423 100644
      """Determine if nova supports a given extension name.
  
 -- 
-2.5.0
+2.4.3
 
