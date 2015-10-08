@@ -64,3 +64,4 @@ enum34
 django-appconf
 django-nose
 nose
+stevedore
