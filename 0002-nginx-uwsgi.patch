@@ -1,22 +1,22 @@
-From 30d4a34e81bfb8e9381354333486f625b3804e1b Mon Sep 17 00:00:00 2001
+From a902f7dbc5d60a2cc9c83668cdacd8073548991d Mon Sep 17 00:00:00 2001
 From: Victor Morales <victor.morales@intel.com>
 Date: Thu, 1 Oct 2015 10:57:30 -0500
 Subject: [PATCH] nginx uwsgi
 
 Signed-off-by: Victor Morales <victor.morales@intel.com>
 ---
- horizon-nginx.conf | 15 +++++++++++++++
+ horizon-nginx.conf | 18 ++++++++++++++++++
  horizon.ini        |  8 ++++++++
- 2 files changed, 23 insertions(+)
+ 2 files changed, 26 insertions(+)
  create mode 100644 horizon-nginx.conf
  create mode 100644 horizon.ini
 
 diff --git a/horizon-nginx.conf b/horizon-nginx.conf
 new file mode 100644
-index 0000000..b828b34
+index 0000000..3ef14bc
 --- /dev/null
 +++ b/horizon-nginx.conf
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,18 @@
 +server {
 +    listen 80;
 +    server_name localhost;
@@ -31,6 +31,9 @@ index 0000000..b828b34
 +    location /static {
 +        alias /usr/share/httpd/horizon/static/;
 +    }
++    # setup MAX to 1TB as specified in
++    # https://github.com/openstack/glance/blob/stable/liberty/etc/glance-api.conf#L74-L79
++    client_max_body_size 1048576M;
 +}
 diff --git a/horizon.ini b/horizon.ini
 new file mode 100644
@@ -47,5 +50,5 @@ index 0000000..b85bd7e
 +uid = httpd
 +gid = httpd
 -- 
-2.1.0
+2.4.3
 
