@@ -1,15 +1,15 @@
-From 487a4598a051448023595297ad119f7477e640bc Mon Sep 17 00:00:00 2001
-From: Victor Morales <victor.morales@intel.com>
-Date: Thu, 1 Oct 2015 11:16:07 -0500
+From a536a266624842f65a643b2c088b495604ab39e2 Mon Sep 17 00:00:00 2001
+From: "Munoz, Obed N" <obed.n.munoz@intel.com>
+Date: Mon, 23 Nov 2015 15:21:00 -0600
 Subject: [PATCH] default config
 
-Signed-off-by: Victor Morales <victor.morales@intel.com>
+Signed-off-by: Munoz, Obed N <obed.n.munoz@intel.com>
 ---
- openstack_dashboard/local/local_settings.py.example | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ .../local/local_settings.py.example                | 30 +++++++++-------------
+ 1 file changed, 12 insertions(+), 18 deletions(-)
 
 diff --git a/openstack_dashboard/local/local_settings.py.example b/openstack_dashboard/local/local_settings.py.example
-index e53ee35..9cee054 100644
+index e53ee35..048958a 100644
 --- a/openstack_dashboard/local/local_settings.py.example
 +++ b/openstack_dashboard/local/local_settings.py.example
 @@ -7,7 +7,7 @@ from horizon.utils import secret_key
@@ -30,6 +30,23 @@ index e53ee35..9cee054 100644
  
  # Set SSL proxy settings:
  # For Django 1.4+ pass this header from the proxy after terminating the SSL,
+@@ -49,11 +49,11 @@ WEBROOT = '/'
+ # NOTE: The version should be formatted as it appears in the URL for the
+ # service API. For example, The identity service APIs have inconsistent
+ # use of the decimal point, so valid options would be 2.0 or 3.
+-#OPENSTACK_API_VERSIONS = {
+-#    "data-processing": 1.1,
+-#    "identity": 3,
+-#    "volume": 2,
+-#}
++OPENSTACK_API_VERSIONS = {
++    "data-processing": 1.1,
++    "identity": 3,
++    "volume": 2,
++}
+ 
+ # Set this to True if running on multi-domain model. When this is enabled, it
+ # will require user to enter the Domain name in addition to username for login.
 @@ -90,7 +90,7 @@ WEBROOT = '/'
  # including on the login form.
  #HORIZON_CONFIG["disable_password_reveal"] = False
@@ -58,6 +75,17 @@ index e53ee35..9cee054 100644
      }
  }
  
+@@ -138,8 +132,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ #]
+ 
+ OPENSTACK_HOST = "127.0.0.1"
+-OPENSTACK_KEYSTONE_URL = "http://%s:5000/v2.0" % OPENSTACK_HOST
+-OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
++OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
++OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+ 
+ # Enables keystone web single-sign-on if set to True.
+ #WEBSSO_ENABLED = False
 -- 
-2.1.0
+2.6.2
 
