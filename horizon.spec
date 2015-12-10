@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 8.0.0
-Release  : 33
+Release  : 34
 URL      : http://tarballs.openstack.org/horizon/horizon-8.0.0.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-8.0.0.tar.gz
 Summary  : OpenStack Dashboard
@@ -84,6 +84,7 @@ Patch1: 0001-enable-dashboard-in-apache.patch
 Patch2: 0002-nginx-uwsgi.patch
 Patch3: 0003-default-config.patch
 Patch4: 0004-Replace-memoized-for-another-solution.patch
+Patch5: 0005-Modify-lock-file-path.patch
 
 %description
 =============================
@@ -115,6 +116,7 @@ python components for the horizon package.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %build
 python2 setup.py build -b py2
@@ -3787,8 +3789,8 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/dashboard/img/wait-gray.svg
 /usr/share/httpd/horizon/static/dashboard/img/wait-green.svg
 /usr/share/httpd/horizon/static/dashboard/img/wait-red.svg
-/usr/share/httpd/horizon/static/dashboard/js/6b862e7eeeb9.js
-/usr/share/httpd/horizon/static/dashboard/js/bf6dde11ee94.js
+/usr/share/httpd/horizon/static/dashboard/js/504f005e33bc.js
+/usr/share/httpd/horizon/static/dashboard/js/b7d9ef479f5d.js
 /usr/share/httpd/horizon/static/dashboard/manifest.json
 /usr/share/httpd/horizon/static/dashboard/project/data_processing/data_processing.event_log.js
 /usr/share/httpd/horizon/static/dashboard/project/data_processing/data_processing.job_interface_arguments.js
