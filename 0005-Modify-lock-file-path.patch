@@ -1,0 +1,26 @@
+From 65bef2b4475057bc7926315a3fbc572b952f9013 Mon Sep 17 00:00:00 2001
+From: Jose Luis Rivera Magallon <jose.luis.rivera.magallon@intel.com>
+Date: Thu, 10 Dec 2015 13:34:34 -0600
+Subject: [PATCH] Modify lock file path
+
+Signed-off-by: Jose Luis Rivera Magallon <jose.luis.rivera.magallon@intel.com>
+---
+ openstack_dashboard/local/local_settings.py.example | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openstack_dashboard/local/local_settings.py.example b/openstack_dashboard/local/local_settings.py.example
+index 048958a..ae4ec33 100644
+--- a/openstack_dashboard/local/local_settings.py.example
++++ b/openstack_dashboard/local/local_settings.py.example
+@@ -90,7 +90,7 @@ OPENSTACK_API_VERSIONS = {
+ # including on the login form.
+ #HORIZON_CONFIG["disable_password_reveal"] = False
+ 
+-LOCAL_PATH = '/tmp'
++LOCAL_PATH = '/run/lock'
+ 
+ # Set custom secret key:
+ # You can either set it to a specific value or you can let horizon generate a
+-- 
+2.1.0
+
