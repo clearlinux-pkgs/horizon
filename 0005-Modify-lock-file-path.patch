@@ -17,7 +17,7 @@ index 048958a..ae4ec33 100644
  #HORIZON_CONFIG["disable_password_reveal"] = False
  
 -LOCAL_PATH = '/tmp'
-+LOCAL_PATH = '/run/lock'
++LOCAL_PATH = '/run/lock/horizon'
  
  # Set custom secret key:
  # You can either set it to a specific value or you can let horizon generate a
