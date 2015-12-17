@@ -4,13 +4,15 @@
 #
 Name     : horizon
 Version  : 8.0.0
-Release  : 34
+Release  : 35
 URL      : http://tarballs.openstack.org/horizon/horizon-8.0.0.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-8.0.0.tar.gz
+Source1  : horizon.tmpfiles
 Summary  : OpenStack Dashboard
 Group    : Development/Tools
 License  : Apache-2.0
 Requires: horizon-python
+Requires: horizon-config
 Requires: horizon-data
 BuildRequires : Babel
 BuildRequires : Django
@@ -41,6 +43,7 @@ BuildRequires : XStatic-mdi
 BuildRequires : XStatic-roboto-fontface
 BuildRequires : XStatic-smart-table
 BuildRequires : XStatic-term.js
+BuildRequires : debtcollector-python
 BuildRequires : django-appconf
 BuildRequires : django-babel
 BuildRequires : django-nose
@@ -91,6 +94,14 @@ Patch5: 0005-Modify-lock-file-path.patch
 Horizon (OpenStack Dashboard)
 =============================
 
+%package config
+Summary: config components for the horizon package.
+Group: Default
+
+%description config
+config components for the horizon package.
+
+
 %package data
 Summary: data components for the horizon package.
 Group: Data
@@ -129,6 +140,8 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 %install
 rm -rf %{buildroot}
 python2 -tt setup.py build -b py2 install --root=%{buildroot}
+mkdir -p %{buildroot}/usr/lib/tmpfiles.d
+install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/tmpfiles.d/horizon.conf
 ## make_install_append content
 cd horizon && django-admin compilemessages && cd ..
 cd openstack_dashboard && django-admin compilemessages && cd ..
@@ -154,6 +167,10 @@ cp horizon-nginx.conf %{buildroot}/usr/share/nginx/conf.d
 chown -R httpd:httpd /usr/share/httpd/horizon
 %files
 %defattr(-,root,root,-)
+
+%files config
+%defattr(-,root,root,-)
+/usr/lib/tmpfiles.d/horizon.conf
 
 %files data
 %defattr(-,root,root,-)
