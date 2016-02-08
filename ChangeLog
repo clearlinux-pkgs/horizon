@@ -1,6 +1,31 @@
 CHANGES
 =======
 
+8.0.1
+-----
+
+* Remove data-type and sort from flavor column
+* Imported Translations from Zanata
+* Remove usage of user project caching
+* Updated from global requirements
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Fix job_binaries deletion
+* Updated from global requirements
+* Update link in release notes to anonymous link
+* Add liberty release notes in YAML format
+* Add reno for release notes management
+* Imported Translations from Zanata
+* Updated from global requirements
+* add Italian localization
+* Imported Translations from Zanata
+* respect webroot setting in containers table
+* Use sum of volumes and snapshots for cinder usage
+* Imported Translations from Zanata
+* Switch to liberty branch for git review
+* Mock flavor_list method in tests for instances
+* Switch to post-versioning
+
 8.0.0
 -----
 
