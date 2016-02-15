@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 8.0.1
-Release  : 36
+Release  : 37
 URL      : http://tarballs.openstack.org/horizon/horizon-8.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-8.0.1.tar.gz
 Source1  : horizon.tmpfiles
