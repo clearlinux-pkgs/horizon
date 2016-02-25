@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 8.0.1
-Release  : 37
+Release  : 38
 URL      : http://tarballs.openstack.org/horizon/horizon-8.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-8.0.1.tar.gz
 Source1  : horizon.tmpfiles
@@ -43,7 +43,6 @@ BuildRequires : XStatic-mdi
 BuildRequires : XStatic-roboto-fontface
 BuildRequires : XStatic-smart-table
 BuildRequires : XStatic-term.js
-BuildRequires : debtcollector-python
 BuildRequires : django-appconf
 BuildRequires : django-babel
 BuildRequires : django-nose
