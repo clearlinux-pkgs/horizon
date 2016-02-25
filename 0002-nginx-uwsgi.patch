@@ -1,13 +1,13 @@
-From a902f7dbc5d60a2cc9c83668cdacd8073548991d Mon Sep 17 00:00:00 2001
-From: Victor Morales <victor.morales@intel.com>
-Date: Thu, 1 Oct 2015 10:57:30 -0500
+From 61c7673e0a00a4c0d2826bf2e3ab9fdc12146202 Mon Sep 17 00:00:00 2001
+From: "Munoz, Obed N" <obed.n.munoz@intel.com>
+Date: Thu, 25 Feb 2016 11:52:03 -0600
 Subject: [PATCH] nginx uwsgi
 
-Signed-off-by: Victor Morales <victor.morales@intel.com>
+Signed-off-by: Munoz, Obed N <obed.n.munoz@intel.com>
 ---
  horizon-nginx.conf | 18 ++++++++++++++++++
- horizon.ini        |  8 ++++++++
- 2 files changed, 26 insertions(+)
+ horizon.ini        |  9 +++++++++
+ 2 files changed, 27 insertions(+)
  create mode 100644 horizon-nginx.conf
  create mode 100644 horizon.ini
 
@@ -37,18 +37,19 @@ index 0000000..3ef14bc
 +}
 diff --git a/horizon.ini b/horizon.ini
 new file mode 100644
-index 0000000..b85bd7e
+index 0000000..0408895
 --- /dev/null
 +++ b/horizon.ini
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +[uwsgi]
 +master = true
 +processes = 3
 +threads = 10
++buffer-size = 8192
 +chdir = /usr/share/httpd/horizon/openstack_dashboard/
 +wsgi-file = wsgi/django.wsgi
 +uid = httpd
 +gid = httpd
 -- 
-2.4.3
+2.7.1
 
