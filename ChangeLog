@@ -1,39 +1,773 @@
 CHANGES
 =======
 
-8.0.1
+9.0.0
 -----
 
+* Imported Translations from Zanata
+* Fixing updating user with no default project
+* Imported Translations from Zanata
+* Fix opening multiple Launch Instance during jQuery table polling
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Update .gitreview for stable/mitaka
+
+9.0.0.0rc1
+----------
+
+* Allow Launch Instance (Angular) from Volume Snapshots
+* Adding missing release notes around upgrades
+* Add missing release notes
+* Make ngcontainers the default Swift UI
+* Fix non-working Angular actions in jquery modified tables
+* Add Horizon support for volume consistency groups
+* Imported Translations from Zanata
+* Fix empty 'href' in link actions after AJAX actions_update
+* Launch Instance: Metadata should inherit from theme
+* Add Network Port selection to new instance launch
+* Branding: Create Network should inherit from theme
+* Do not make unnecessary calls to Nova from FIPs and Volumes tabs
+* Make region list case-insensitive sorted
+* Imported Translations from Zanata
+* Fix the size of the close icon on delete confirm dialog
+* ngTables should use themable checkboxes
+* Release Floating IPs should use proper icon
+* Fix 'Manage Volume Attachments' -> 'Cancel' button appearance
+* Magic search shouldn't re-appear after selecting facet
+* Missing default value on horizon.tables Column
+* Imported Translations from Zanata
+* Add ngSwift object actions
+* Add ngSwift container actions
+* Login page shouldn't show Required Asterisks
+* Branding: Workflow cancel btn should be themable
+* Removing whitespace
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Remove gap in angular table actions menu
+* Change projects redirects to overview page
+* Missing translate attr in ng Launch Instance
+* Add validateUnique form input validator
+* Images Actions Return Promises
+* Sync paths in POT files with CI scripts
+* Material theme form errors - fix red text on red bg
+* Form Fields Required Visual treatment is missing
+* Ensure there is checkbox before accessing it's properties
+* changing-fa-icon-to-trash-icon
+* Removed unnecessary truncate styles
+* Fix BaseRegion and TabbedFormRegion initialization
+* Remove default event handler from theme switch links
+* Hamburger Menu icon - fix the alignment of the animated arrow
+* Remove unnecessary translate attribute on Theme preview page
+* Launch Instance Wizard - Avail items count doesn't update
+* Fix legacy drag and drop widgets
+* Optionaly require keypair on ng-launch-instance
+* Imported Translations from Zanata
+* Retrieve domain scoped token
+* Angular Policy Caching
+* Refactor some table rows & cells waits in i9n tests
+* Imported Translations from Zanata
+* Disable Glance option to publicize image on Update
+* Fix translator word order control in load-edit
+* Honor comments for translators when extracting messages
+* Add ngSwift containers and objects display
+* Imported Translations from Zanata
+* Horizon page-header Margin needs to be smaller
+* Remove Horizon scss variables: New Launch Instance
+* Add function to recreate ec2 credential
+* Rename a panel name "NGContainers" with "Containers"
+* Use interpolate in JS to allow translators to control word order
+* Updated from global requirements
+* Updated from global requirements
+* Fix test cases that have no expectations
+* Don't force people to security groups after they add a FIP
+* Imported Translations from Zanata
+* Handle Volume launch as instance(NG) in Volume tables
+* Add icon define in _icon.scss
+* local_settings needs 2.76% more ',' and an '_'
+* Hamburger navigation now sits above containers
+
+9.0.0.0b3
+---------
+
+* Enable Angular Launch Instance by default
+* Material Design: New LI Tweaks
+* Imported Translations from Zanata
+* Fix theming in angular launch instance
+* Material: Selection Menu headers aren't visible
+* Horizon Checkboxes are now themeable
+* Fixing heatclient release compat issues
+* Deprecate default_*_subnet_pool_label options
+* Add test_volume_snapshots_pagination()
+* Imported Translations from Zanata
+* Adding Resource Type registration
+* Change "Reboot Hard" to "Hard Reboot"
+* Python table is returning invalid template name
+* Match python/ angular table styles
+* Imported Translations from Zanata
+* Remove Horizon scss variables: $code-font-family
+* Fix an error which cause on Feb 29 in user setting
+* Imported Translations from Zanata
+* Add policy support to workflow steps
+* Remove unused pngmath Sphinx extension
+* Add ngSwift Django Interface
+* Revert "Fix bug at update quota of project's network item"
+* Fix bug with tabs navigation
+* Imported Translations from Zanata
+* Updated from global requirements
+* Fix documentation of angular modal spinner
+* Material: Sidebar needs to compress responsively
+* Fixed over-application of webroot in disabled image panel
+* Add Swift REST API
+* Dynamic Themes
+* Disable shared option for non admin users in network
+* Reduce lint warnings
+* Removing unneeded markup from image details page (angular)
+* Add release note for the angular extensible service
+* Amend hz-table-footer documentation and allow optional message
+* Add host aggregate create/delete test
+* Adding features to MagicSearch
+* Updating registry to include some concepts
+* Update example local.conf
+* properly mock cinderclient calls in tests
+* Allow deleting gateway interfaces on network topology
+* Added test for check associate/disassociate actions for floating ip
+* Imported Translations from Zanata
+* Look for volumev2 endpoints instead of volume
+* Imported Translations from Zanata
+* Update URLs to Django 1.8 style for plugins
+* Improve keypair delete warning message
+* Fixed a few missed translation strings on Theme preview page
+* Add some new heat-snapshot-api
+* Trust sql middleware value conversion and stick to the spec type
+* Updated from global requirements
+* Use isCurrentProject in NG images delete action
+* Increase Create Volume Step Coverage NG Images
+* Force line break for detail table cells
+* Imported Translations from Zanata
+* Add local_settings.d/ dir for settings snippets
+* Adding resource type registry service
+* Tablecontroller should return only selected items
+* Tablecontroller should use ctrl instead of scope
+* Allow optional default value in noValue filter
+* Imported Translations from Zanata
+* Branding: Horizon close buttons should use icon
+* Maintain order when resolving promise list
+* Running eslint in quiet mode with color
+* Add missing column rxtx_factor to ng flavors table
+* Using events to clear table selections instead of scope
+* Hide delete volume if it has snapshot
+* Adds encoding to sample config for openstack-dashboard
+* exclude subnets without gateway in create interface
+* Add a close icon in the upper right in Update Metadata modal
+* Add support for identity provider protocol CRUD
+* Add REST API for working with floating IPs
+* Updating password in local_conf
+* Ignore local folder
+* Test for images (create volume/launch instance from image)
+* The update image should be changed to edit image
+* User isCurrentProject in metadata action
+* Add test_router integration test
+* Protect cinder list against permission issues
+* Added test for check QoS Spec creation and deletion functionality
+* Add/Fix several Port Details fields
+* Tests for volumes pagination are added
+* Add isCurrentProject to userSession service
+* Add rxtx factor to flavors
+* Allow chaining method calls in extensible service
+* Fix network duplication check logic
+* Change TestImageAdmin to test proper pages
+* Fix exceptions_captured manager in i9n tests
+* Fixed missing ',' in docstring of Column table
+* Increase branching testing
+* Trivial: Fix import order in api/rest/*.py
+* Material: Compression warning for missing icon
+* Image Detail Redesign (Angular/UX)
+* Webroot Theme is no longer needed
+* Updated from global requirements
+* Add missing network mock
+* Adding hz-if-neutron-extensions directive
+* Fix misc small issues with docs
+* Added test for check volume types management functionality
+* Imported Translations from Zanata
+* Router namespace not created in controller
+* Allow setting default value for config_drive
+* Add configuration mechanism to turn off browser maximisation
+* Re-enable keypairs integration test
+* Adding multiple row actions for the Image table
+* Port last unit tests to Python 3
+* API Services for Flavors Panel
+* Fix bug at update quota of project's network item
+* Ensure that integration tests are being run in proper project
+* Allow @tables.bind_row_action() to bind in 2 additional scenarios
+* Imported Translations from Zanata
+* Style: Material: Fixes colors for navbar and menu
+* Context Picker should inherit BS dropdown styles
+* Add Metadata Tree widget to NG image table drawer
+* Launch Instance - UI for Download Key Pair
+* Launch Instance - Create Keypair Service
+* "Required" fields are no longer visually indicated
+* Don't overwrite original traceback in certain cases of i9n failures
+* Integration tests naming sanity
+* [Launch Instance Fix] Magic Search in new Launch Instance
+* Switch to use "# noqa" correctly
+* Adding Neutron extensions API
+* Add test for create/delete Namespace inside "Metadata Definitions"
+* ng launch instance: Validate minimun ram for snapshot source
+* Port identity provider dashboard to Python 3
+* Imported Translations from Zanata
+* Fix Create Image angularjs code
+* Truncate image name in admin/images table
+* Remove extraneous table padding
+* Integration tests - networkspage and test
+* Add test for create/delete image under Admin user
+* Make Port Details VNIC type translatable
+* Add breadcrumbs on Network Detail
+* Imported Translations from Zanata
+* Follow-up patch of bug: #1527457
+* Modify update user info from pencil icon in keystone v2
+* Branding: Nav icon spacing should use css
+* Container Loader Image now Themable
+* Add Magic Search Filtering to NG Flavors
+* Obey Naming Conventions for Angular Images Panel Services/Controllers
+* Add test_images_pagination()
+* Use OS::Nova::Server resource type for instance metadata
+* Add Create Volume Action for the Image
+* Add Network Port selection to instance launch
+* Updating JS unit test coverage threshold
+* api cinder volume_migrate wrong number of params
+* Support docker image type in ng launch instance wizard
+* Zoom out pages in i9n tests
+* Add unit tests for load-edit directive
+* Override get_object_display() for IdP table
+* Add basic CRUD for federation mapping
+* Removing container ID element
+* Add angular limit filter
+* Default Theme:Responsive Menu shouldn't have Arrow
+* Add Glance v1 / v2 capable angular image visibility filter
+* Port dashboard containers to Python 3
+* Support xvfbwrapper 0.2.8
+* Fixes reference to css for domain and region
+* Imported Translations from Zanata
+* Set proper z-index value on messages and navbar
+* Fix i9n tests pluggable nav structure
+* Imported Translations from Zanata
+* Add pagination to volume snapshots and backups pages
+* Sort images list in ascending alphabetical order
+* Add snapshots integration tests
+* Added tests for check volumes management functionality
+* Support properties_target when fetching namespaces
+* Updated from global requirements
+* Adding Magic Search codebase to Horizon
+* Add status 'N/A' in Port tables
+* Remove the truncate function from horizon.quota.js
+* Style: Login page should not have scroll bars
+* Changed to DeprecationWarning in BatchAction
+* Add policy directive into policy.rst
+* Fix errors on keyboard nav across tabs on forms
+* Add filter to replace null to "None"
+* Adds support to accept IPv6 in VIP Address for LB Pool
+* Imported Translations from Zanata
+* Remove unnecessary 'volume' service check
+* Material Theme: Buttons need border radius
+* Clean unnecessary django tag
+* Updated from global requirements
+* Clean up horizon.scss - Organize Imports
+* Material theme icon not showing for inline edit close
+* assertEquals is deprecated, use assertEqual
+* Fixing timezone awareness
+* [Django 1.9] Stop using django.utils.importlib
+* Pass the proper params to getPorts call
+* Refresh the networks on ajax update
+* fix ClientException call
+* Plugin Docs
+* Clean up horizon.scss - Remove remaining styles
+* Clean up horizon.scss - default/bootstrap/_type.scss
+* Clean up horizon.scss - default/boostrap/_form.scss
+* Clean up horizon.scss - serial_console.scss
+* Clean up horizon.scss - _tables.scss
+* [Django 1.9] Remove testserver from expected_url
+* Imported Translations from Zanata
+* Branding: Context selector delim should be icon
+* Logo on non-standard themes should be centered
+* Updated from global requirements
+* Remove all pre-Django 1.8 workarounds
+* Introduce field mappings for FormRegion descendants in i9n tests
+* Reduce number of calls to Selenium for form fields
+* Disable unnecessary warnings from heatclient about object comparisons
+* Themeable loader/progress bar for tables
+* Add message of the day option
+* Only specify use of html5 locationProvider if base tag
+* Place exports for dsvm-integration job into a separate file
+* Common Wizard Modal Service for Angular Workflows
+* Add pagination support to the volume page
+* Always wait for spinner to disappear after form submit
+* Improve working with messages in integration tests
+* Rework table actions in integration tests
+* Try to be more verbose on sec group error
+* Adding Ceilometer Alarm API
+* Fix policy.rst
+* Add support for identity provider management
+* Remove table search placeholder overwrite
+* Add 'width' for name-field
+
+9.0.0.0b2
+---------
+
+* Fix action list icon use and spacing
+* Add trove and sahara plugins in docs
+* Imported Translations from Zanata
+* Correct usage documentation for simple modal service
+* Launch Instance - Nova API for Download Key Pair
+* Fix metadata tree available filter
+* Conform to <span> for icons over <i>
+* Remove keypair ID from details table
+* [Django 1.9] Replace request.REQUEST with POST/GET
+* Fix small typo in tutorial
+* In integration tests reference table columns by name
+* Remove redundant dashboard.login_url setting from horizon.conf
+* [Django 1.9] Update template.base.Library() import
+* [Django 1.9] Do not use TemplateDoesNotExist from Django
+* [Django 1.9] Replace django.utils.unittest
+* [Django 1.9] Do not use django.utils.log.NullHandler
+* Convert present/past action to methods
+* Port volume backup dashboard to Python 3
+* Port loadbalancers tests to Python 3
+* Translate status in network topology
+* Use interpolate in JS to allow translators to control word order
+* Move integration_tests.tests.decorators one level up
+* Remove not required packages in requirements.txt
+* Improve field validation/error handling for flavor creation
+* Simplify tables page regions
+* Remove trove and sahara clients from requirements
+* Modify 'admin' used by fixed string
+* Fix help text in "Create Network" dialog
+* Branding: Horizon Header should be more composable
+* Clarify the themeing documentation
+* LocationProvider should be set up on the Horizon App
+* Set <base> element ONLY for Angular Panels
+* Branding: Horizon needs global footer override
+* Add the max value to the tooltip for the "Items per Page" field
+* Fixed the width of the stack template detail box
+* Revert "Specify <base> element in all pages"
+* Drop izip and izip_longest removed in python3
+* API for Metadata Definitions
+* Documentation for specifying Template as URL
+* Corrected typo in fetch security groups comment
+* Fix typos of comments in delete-modal service
+* Fixes Python 3 compatibility for filter results
+* Imported Translations from Zanata
+* Clean up horizon.scss - _resource_topology.scss
+* Clean up horizon.scss - _modals.scss
+* Clean up horizon.scss - _membership.scss
+* Clean up horizon.scss - _datepicker.scss
+* Clean up horizon.scss - _util.scss
+* Clean up horizon.scss - _legacy.scss
+* Specify <base> element in all pages
+* Add Angular Directive to show msg for empty tables
+* Add py27dj19 tox env
+* Fix doc incorrectly specifying alert-error
+* Eliminate ambiguity when matching panel in i9n tests
+* Clean up horizon.scss - _layout.scss
+* Imported Translations from Zanata
+* Delete some deprecated codes
+* Revert "Specify <base> element in all pages"
+* Support javascript translation for plugin
+* Add expect clause when the test passes
+* Update eslint-plugin-angular to the latest
+* Create a ISO Date Time Filter
+* Clean up horizon.scss - Keypairs
+* Provide integration test_hooks to be used in gate job
+* Imported Translations from Zanata
+* Magic Search now inherits from Bootstrap Theme
+* Transfer table should update allocatedIds on allocated change
+* Set target to _self for Header Links
+* Revert "Neutron: fix ICMP code and type validators"
+* Updated from global requirements
+* Fix i18n msgfmt bug in launch-instance
+* Replace "no quota" with "No Limit"
+* Can't ignore required package script
+* Correcting heat resource drill down
+* Specify <base> element in all pages
+* Add Action to delete multiple and single images to images panel
+* Revert "LocationProvider should be set up on the Horizon App"
+* Delete unnecessary permissions on panel
+* Internet Explorer minimum version raised to 11+
+* Add booleanAsPromise to q.extensions service
+* New Preview Page Needs All Input Types
+* Use the default `url` tag instead
+* Use assertTrue/False instead of assertEqual(T/F)
+* New Preview Page Needs All Sizes of Button Groups
+* Remove inline styles from Preview Page
+* Add volume type encryption update
+* Add Metadata page to angular Launch Instance wizard
+* Add action for editing instance metadata
+* Adding informative message when deleting a used volume type
+* "QoS spec" page is displayed as a modal dialog
+* Modify so as to display fa-check icon with a single line
+* Neutron: fix ICMP code and type validators
+* py3: replace reload with six.moves.reload_module
+* Use the horizon.conf's dir as the basedir for i9n screenshots
+* Fix typo s/pane/panel/ and s/javascript/JavaScript/
+* Python 3 deprecated the logger.warn method in favor of warning
+* Replace assertTrue(isinstance()) with assertIsInstance()
+* Use new log style when LOG.error
+* Replace assertEqual(None,*) with assertIsNone
+* Wrong usage of "an"
+* Make it possible to pick False for default stack parameter value
+* Trivial: Remove unused services injecting
+* Trivial: Remove unused logging import
+* Pagination for flavor - prev link
+* Remove an unused method in admin/hypervisors view
+* Enable "no-new" and "guard-for-in"
+* Enable no-redeclare
+* Enable semi-spacing
+* Enable consistent-return
+* Misspelling in message
+* Modify description form in Create or Update Image dialog
+* Fix some inconsistency in docstrings
+* LocationProvider should be set up on the Horizon App
+* Clean up horizon.scss - _debt.scss
+* Clean up horizon.scss - _contrib.scss
+* Clean up horizon.scss - Flavor Table
+* Clean up horizon.scss - Admin Sys Info
+* Excise Trove from Horizon
+* Style: Material Design: Alerts should have a box-shadow
+* default theme's warning color is not readable
+* Horizon Messages now inherit from a Bootstrap Theme
+* Fix volumes no attribute tenant_name error
+* Actions directive should take Service
+* py3: Replace dict.iteritems() with dict.items()
+* Fix Row Action Button styling issues
+* Add breadcrumbs on Volume Encryption Details
+* Barcharts now inherit from a Bootstrap Theme
+* Add ability to clear image description
+* Imported Translations from Zanata
+* Add handle get_file when launch stack from horizon
+* Remove glance image API release note
+* Fix no tenant name in admin image panel when UpdateRow
+* Security groups page and test for create/delete secgroup
+* Eliminate mutable default arguments
+* replace deprecated iso8601_from_timestamp
+* Fix 3-components accessors for TabbedTables in i9n tests
+* isoformat instead of deprecated timeutils.isotime
+* Imported Translations from Zanata
+* Quota pages now inherit from Bootstrap Theme
+* Add API services for system information
+* Allow specifying item to use for actions in the actions directive
+* Increase default Python socket timeout
+* Skip test_keypair integration test until it's fixed
+* Add integration tests section to testing docs
+* Pagination for flavor - more link
+* Add missing unit tests for Heat Stacks Details
+* Updated from global requirements
+* Remove arguments "{}" in function definitions
+* Set autodismissAlert on each alert
+* Raise JS unit test coverage threshold
+* remove the default arguments "[]"
+* Updated from global requirements
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* hzIfApiVersion directive to check if api version enabled
+* Improve readability of Horizon Packaging doc
+* Add extensions to $q for resolving all promises
+* Deprecated tox -downloadcache option removed
+* Use "GiB" and "gibibyte" labels in volume panels
+* Fix duplicate Image URL validation message
+* Add getServers function to nova rest API
+* Add testr support
+* VPN forms help text could be improved
+* Add test for the Heat Service validate method
+* Fix bad performance when editing domain members
+* Fix decription for admins Image create modal
+* Display clear error message while no subnet poll support
+* Missing icons for Material Theme on Stacks Panel
+* Delete the unused LOG configure code
+* Imported Translations from Zanata
+* Add API services for Create a Volume, get QoS and tenant limits
+* Fix the Split button to enable the dropdown toggle
+* Fix return value in "Update default quota"
+* Fix Dialogs section ID in theme preview
+* Make integration tests pluggable
+* Added test coverage for toast.service.js
+* Fixes heat templates hidden parameters are not loading problem
+* Removing sahara specific exception ref
+* Add Cached loader for templates
+* Display user's description in user detail
+* Add Developer Dashboard + Bootstrap Theme Preview
+* Imported Translations from Zanata
+* Enable strict
+* Fix errors showing in Network tests
+* Fix decription for Image create modal
+* Protocol port should be required for LBaaS Add Member
+* Do not use empty description fields
+* Fix typo in test data for keystone
+* Move Detail page styling into theme
+* Excising Sahara from Horizon
+* Removing version line from setup.cfg
+* Move Page Layout Styles out of horizon.scss
+* usage.html doesn't need such specific styles
+* Horizon Dropdown now inherits from Bootstrap Theme
+* Make some volume related quotas translatable
+
+9.0.0.0b1
+---------
+
+* Pass result of submit to wizard modal close
+* Add launchpad link to the plugin registry list
+* Imported Translations from Zanata
+* Give material theme modals more room
+* Show a toast with success on instance creation
+* Launch Instance Modal should be exist as a Service
+* Imported Translations from Zanata
+* Add API to Create/Update/Delete Images in Glance
+* Adding tests for ng identity basePath constant
+* Add style to wrap pre tag
+* Force releasenotes warnings to be treated as errors
+* Change column order for Orchestration Services table
+* Disable angular wizard finish button when clicked
+* Improve release notes guidance - single patch
+* Make breadcrumb appear on sec groups and keypair details
+* Make unit testing less reliant on HTML fragments
+* Networks tab does not show external configuration
+* Replace "Terminate Instance" with "Delete Instance"
+* description field was missing from the initial values
+* Escape RegEx characters from table quick search text
+* Try to avoid intermittent test_dashboard_help_redirection failure
+* Deleting unnecessary spaces in instances's log
+* Imported Translations from Zanata
+* Add symbol equal "=" in several filter texts
+* Fix for the broken header's dropdowns for both v0.11.2 and v0.13
+* Imported Translations from Zanata
+* Enable eqeqeq
+* Allow configuration of nova micro-version in the settings
+* Added filter for firewall tables
+* Imported Translations from Zanata
+* Enable PhantomJS for running Selenium tests
+* Adding download for openrc file for keystone v3
+* material theme close icon isn't showing up
+* Fix flavor quota charts in NG Launch Instance
+* Top Nav shouldn't include giant bottom margin
+* Top and Bottom Padding should be removed from navbar-brand
+* REST API to Get a Volume and Volume Type(s)
+* Disable all new linting rules in legacy code
+* Split instance details and source in Launch Instance wizard
 * Remove data-type and sort from flavor column
+* Translate Floating IPs on overview page
+* Handle absence of cinder default volume type
+* Add Reject option to Firewall Rules
 * Imported Translations from Zanata
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Updated from global requirements
+* Enabling strict di mode
+* Fixed Update Metadata modal description's typos
+* Add ngroute libraries to appropriate paths
+* Simplified boolean variable check
+* Imported Translations from Zanata
+* Fix mocks on update firewall rule tests
+* Followup patch for `Improve Firewalls help text`
+* Fix 302 error on subnet tests
+* Handle glanceclient CommunicationError in horizon
+* Change Permanent Cookie Contain Sensitive Info
+* Enable radix
+* Enable no-unused-vars
+* Add policy check for project detail link
+* Imported Translations from Zanata
+* Add version check for listing namespaces
+* Improve Firewalls help text
+* Update nova policy file
+* Remove Old Images
+* Basic Tabs now inherit from a Bootstrap Theme
+* Cleaning up unused injected dependency
+* Correcting an ngDoc format error
+* Imported Translations from Zanata
+* Document release notes process
+* Document how to generate docs using tox
+* Enable no-multi-spaces
+* Upgraded eslint-config-openstack to 1.2.3
+* Angular alert service - add auto dismiss
+* Horizon Login now inherits from Bootstrap Theme
+* Drop Django 1.7 support
+* Updated from global requirements
+* Remove legacy models.py files
+* Imported Translations from Zanata
+* Add breadcrumbs to final details pages
+* Add dev docs for SCSS/and styling in Horizon
+* Imported Translations from Zanata
+* Basic tables now inherit from Bootstrap Theme
+* Support angular workflow extension as a feature plugin
+* Harden Material Theme
+* Show missing info in volume detail view
+* Imported Translations from Zanata
+* Update startdash/startpanel for newer Django patterns
+* Modify the Quickstart-horizon doc grammar
+* Adding support for shared option in Network
+* Fix config ordering for identity plugin file
+* Separate agents tests from networks tests file
 * Remove usage of user project caching
-* Updated from global requirements
-* Imported Translations from Zanata
-* Imported Translations from Zanata
-* Fix job_binaries deletion
-* Updated from global requirements
-* Update link in release notes to anonymous link
-* Add liberty release notes in YAML format
+* Add support for IP Version in Horizon FW-Rule
+* New Theme Work Needs Better Documentation
+* hz-page-header should allow string interpolations
 * Add reno for release notes management
+* Revert "Fixes Broken Error Message on Subnet Creation"
+* Imported Translations from Zanata
+* Remove unnecessary ugettext_lazy
+* Retire the reference of StackForge
+* Update Liberty release notes to match wiki
+* adding general packaging information
+* Imported Translations from Zanata
+* Add firewall detail actions and breadcrumb nav
+* Add breadcrumb to more details pages
+* Add STATUS_DISPLAY_CHOICE which matches Nova vm state
+* Fix Python 3 issues in dashboard image tests
+* Port network topology tests to Python 3
+* Port dashboard stack tests to Python 3
+* Port dashboard router tests on Python 3
+* Port project instance tests to Python 3
+* tox: add /bin/bash to whitelist_externals
+* Navigation + cleanup for details pages
+* py3: Fix unicode versus bytes issues
+* doc: subsections for neutron releated settings
+* Separate Ports tests from Networks tests
+* Imported Translations from Zanata
+* Take shared networks into account for quotas
+* Remove some old (pre-1.8) Django compatibility code
+* Imported Translations from Zanata
+* Dropdowns should have a consistent design
+* Adds config to disable the password in stack
+* add Italian localization
+* Made instance state values in the CSV summary translatable
+* Use sum of volumes and snapshots for cinder usage
+* Add Kilo Release Notes
+* Imported Translations from Zanata
+* Don't hide Karma coverage reports
+* Adding tests for untested areas
+* Clean up spec files in horizon framework directory
+* Update Plugin Registry
 * Imported Translations from Zanata
 * Updated from global requirements
-* add Italian localization
+* Fix infinite spinner for Angular panels
+* Actions directive for dynamic actions
+* Add a Delete Modal Service for deleting entities
+* Make sure dashboard has a default panel group
+* Add help text for IPv6 security roles
 * Imported Translations from Zanata
-* respect webroot setting in containers table
-* Use sum of volumes and snapshots for cinder usage
 * Imported Translations from Zanata
-* Switch to liberty branch for git review
+* Directive to check if Cinder Extensions are enabled
+* Refactor status and admin state translation code
+* Remove environment_version ref from quickstart guide
+* Updated from global requirements
+* Add REST API to get Glance API Version
+* Corrected spelling errors throughout the project
 * Mock flavor_list method in tests for instances
-* Switch to post-versioning
+* Imported Translations from Zanata
+* Update plugin registry - s/stackforge/openstack
+* Fix home button in 500 page
+* Imported Translations from Zanata
+* Directive to check if policy check passes
+* Correct the Karma conf to search correct dirs
+* Add angular flavors panel
+* Fixes Broken Error Message on Subnet Creation
+* Updated from global requirements
+* Improving JS unit test branch coverage
+* Wrong url in stack preview detail page
+* Imported Translations from Zanata
+* In Stack Details do not display as links events leading to nowhere
+* Wait until additional window is opened in integration tests
+* Fix accidentally broken Instances integration test
+* Integration tests - Instances tests
+* Do not match table actions by ordering in integration tests
+* workflow.js should be named as workflow.module.js
+* Add correct license for hzPasswordMatch and bi-directional check
+* Updated from global requirements
+* Prevent the click loss at navbar accordion in integration tests
+* Upgraded eslint rule libraries
+* Remove models.py from tutorial
+* Imported Translations from Zanata
+* Add correct license for simple modal
+* Port admin metering tests to Python 3
+* respect webroot setting in containers table
+* Imported Translations from Zanata
+* caret button shouldn't be disabled
+* Wait until the success message popup disappears before proceeding
+* Dump browser log on integration test failure
+* Default Sidebar should grow with page height
+* Missing translate in dropdown caret button
+* Add Cinder Extensions Service for Angular
+* Add API for getting Cinder Extensions
+* Add Liberty Release Notes
+* Show Image ID on Instance Overview
+* Add British English l10n
+* py3: Replace unicode with six.text_type
+* Imported Translations from Zanata
+* admin not able to set maintenance state for volume
+* Horizon styles should use vendor prefix mixins
+* Made error fields in ng launch instance workflow more visible
+* Replace filter() with list-comprehension
+* Remove disabled attribute from select fields on submit
+* Changes cursor to hand/grab in network topology
+* Make IPv4 address sorting work on all tables
+* Remove duplicate deleted status definition
+* Imported Translations from Zanata
+* Imported Translations from Zanata
+* Corrected wrong url in router detail page
+* Add HTTPS to image location help text
 
 8.0.0
 -----
 
 * Imported Translations from Zanata
+* Updated from global requirements
 * Imported Translations from Zanata
+* Imported Translations from Zanata
+* Fixing template filtering by plugin name
+* Fix TypeError on comparison on Python 3
+* Port remaining Horizon tests for Python 3
+* py3: Add json attribute to HTTP response objects
 * Update Horizon language list for Liberty
+* Adds deactivated status for glance image
+* Remove redundant success messages for LBaaS delete actions
 * Imported Translations from Zanata
+* Remove an unnessary assert call in InstanceTests
+* Create volume pre-select default vol-type
+* Creating new user does not require project
+* Update Horizon language list for Liberty
+* Move humanize and truncate to horizon.quota.js
+* Add test coverage for auth_type 'credential'
+* Remove _() from strings used only for logging
+* Removing last_activity session flag
+* Magic Search is firing multiple checkFacets event
+* Heat Stacks Details: Events table doesn't show up
+* Removing check for unsupported Django version
+* Uncapitalize the first letter of non init functions
+* security group not mandatory to create instance
+* Add tests for controllers in tech-debt
+* Adding ifAllowed method to policy service
+* Port horizon tabs tests to Python 3
+* Port babel_extract_angular tests to Python 3
+* Improve "Disassociate floating IP" confirmation message
+* Show external networks
 * Do not pass along cidr and ip_version to create_subnet when not used
+* Fix horizon/test selenium tests for Django 1.8
+* Add missing MEDIA config in test settings
+* Fix loading of angular in jquery modals
+* Rename launch instance model file
+* Fixed empty "VPN Connections" value from displaying a blank value
+* Fix Python 3 issue in horizon DataTable
+* Add icons for Heat Stacks BatchActions
+* Create a Angular Modules for Admin Dashboard
+* Finally remove policy engine code from openstack_dashboard
+* Port openstack dashboard overview tests to Python 3
+* Port horizon utils tests to Python 3
+* Fixes spelling mistake in Error Message
+* Imported Translations from Zanata
+* Add optional Report Bug link to Horizon
+* lbaas associate fip to vip table action bug
 
 8.0.0.0rc1
 ----------
@@ -41,19 +775,26 @@ CHANGES
 * Imported Translations from Zanata
 * Neutron Quota Settings Flag Disables Neutron GUI
 * Cleanup of Translations
+* Open Mitaka development
 * Typo fix in Trove panel
 * Imported Translations from Zanata
 * Updated from global requirements
+* Minor refactoring of openstack_dashboard.api.neutron
+* Enable pagination for Project->Images view
 * Imported Translations from Zanata
 * Remove duplicate key from dictionary
+* VPNaaS delete actions refactoring
 * FWaaS delete actions refactoring
 * Add external IP fields to VPNaaS details
+* Include JS from openstack_dashboard/**/static for code coverage
 * Use the User model from d-o-a
 * Fix UTF-8 handling in tables
 * Imported Translations from Zanata
 * Remove unnecessary brackets from enabled files
+* Improve error message for creating QoS Spec
 * Initial support for database clustering in Horizon
 * Update WSGI app creation to be compatible with Django 1.7 or greater
+* Fix Admin / Subnet Detail action URLS
 * Imported Translations from Zanata
 * Fix all the network/router/subnet/port display as name_or_id
 * Pass Heat environment through form variables too
@@ -78,20 +819,24 @@ CHANGES
 * Use raw data for inline edits of boolean fields
 * Use keyword substitution in horizon framework filters.js
 * Fix Load Balancer table Subnet row displays CIDR
+* Add _save_screenshot functionality to helpers
 * Remove session caching of can_access call results
 * Added a django extract for .csv files
 * Remove .tx/config
 * Unable to attach volume to instance
 * Fix typo in launch instance help
 * Updated from global requirements
+* TestCase: add aliases to assert methods on py3
 * FWaaS tests improving
 * "scss is misspelled as css" in these scss files
 * Fix Python 3 issue in DataTableMetaclass constructor
 * Port horizon base tests to Python 3
 * Fix bug preventing clusters to be created
 * Moving translation to HTML for launch-instance key pair step
+* Do not pass along cidr and ip_version to create_subnet when not used
 * Simplify is_service_enabled
 * Fix "create failed" bug in add DHCP agent form
+* IDP specific websso
 * Adds button to disable more than one domain at a time
 * Fix a bug in "Add Interface" form modal
 * Add Curvature topology
@@ -118,6 +863,7 @@ CHANGES
 * Updated from global requirements
 * Ensure exc message is included in user_message
 * Move volume types Forms out of volumes
+* Improve project image unit test
 * Moving translation to HTML for launch-instance configuration step
 * Updated from global requirements
 * Update App Catalog UI Plugin Info
@@ -136,6 +882,7 @@ CHANGES
 * Updating doc on Django version
 * Change awkward wording for poweroff dialogue
 * Fix eslint violations regarding newlines
+* Tolerate unconfigured glance service when loading image name
 
 8.0.0.0b3
 ---------
@@ -160,6 +907,7 @@ CHANGES
 * Port error_pages tests to Python 3
 * Port config_rest_tests to Python 3
 * Update Users Table to single HTML
+* Cleaning up module dependency management tree
 * Adding missing spec for widgets.module.js
 * Add license headers to the panel/dashboard templates
 * Imported Translations from Transifex
@@ -198,6 +946,7 @@ CHANGES
 * Updated from global requirements
 * py3: Replace unicode with six.text_type
 * Update Table to Single HTML for Readability
+* Fixed Typos in comments
 * Revert "Fix broken header dropdowns"
 * Delete redundant 'CreateVolumeTypeView' class
 * Integration tests no longer use form's fields ordering for matching
@@ -357,6 +1106,7 @@ CHANGES
 * Use form field errors on volume Extend form
 * JSCS Cleanup - Metadata widgets cleanup
 * Remove Router Dashboard
+* Exclude network which don't have subnet
 * CSS get None when error in inline_editing
 * Remove key-pair-details.html duplicate
 * favicon, logo and logo-splash should allow theme overrides
@@ -393,6 +1143,7 @@ CHANGES
 * Add plurals and comments to angular i18n
 * Replace dict.iteritems() with six.iteritems(dict)
 * Imported Translations from Transifex
+* Fix too loose url regex for snapshot creation
 * Client-side Magic Search
 * Add Angular Basic Page Header Directive
 * N1Kv: Fix failing network and port creates
@@ -440,6 +1191,7 @@ CHANGES
 * Get izip from six.moves
 * Replace filter() with a list-comprehension
 * Use relative imports
+* Remove current consumer in QoS spec edit
 * Imported Translations from Transifex
 * Dashboard ReOrg - Move cloud-services into app/core
 * LBAAS VIP floating IP table actions
@@ -736,6 +1488,7 @@ CHANGES
 * ngReorg - align module names with directory
 * Imported Translations from Transifex
 * Bootstrap variable overrides should only be default values
+* Trust sql middleware value conversion and stick to the spec type
 * Imported Translations from Transifex
 * Made HorizonComponent class Python3 compatible
 * ngReorg - create 'widgets' module
@@ -940,6 +1693,7 @@ CHANGES
 * Updated from global requirements
 * Make "RAW" in image table translatable
 * Make Image Type translatable
+* Change ports range in validators and test function
 * Open Liberty development
 * Imported Translations from Transifex
 * [Launch Instance Fix] Nested search box in flavor step
