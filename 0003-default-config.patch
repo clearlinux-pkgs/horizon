@@ -1,18 +1,20 @@
-From a536a266624842f65a643b2c088b495604ab39e2 Mon Sep 17 00:00:00 2001
-From: "Munoz, Obed N" <obed.n.munoz@intel.com>
-Date: Mon, 23 Nov 2015 15:21:00 -0600
+From e74cbff9899a8964dc65ac5e4963be95e08f884b Mon Sep 17 00:00:00 2001
+From: Alberto Murillo <alberto.murillo.silva@intel.com>
+Date: Fri, 18 Mar 2016 16:09:36 -0600
 Subject: [PATCH] default config
 
 Signed-off-by: Munoz, Obed N <obed.n.munoz@intel.com>
+Signed-off-by: Alberto Murillo <alberto.murillo.silva@intel.com>
+Signed-off-by: Jose Luis Rivera Magallon <jose.luis.rivera.magallon@intel.com>
 ---
- .../local/local_settings.py.example                | 30 +++++++++-------------
- 1 file changed, 12 insertions(+), 18 deletions(-)
+ .../local/local_settings.py.example                | 32 +++++++++-------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
 diff --git a/openstack_dashboard/local/local_settings.py.example b/openstack_dashboard/local/local_settings.py.example
-index e53ee35..048958a 100644
+index 0569735..4366179 100644
 --- a/openstack_dashboard/local/local_settings.py.example
 +++ b/openstack_dashboard/local/local_settings.py.example
-@@ -7,7 +7,7 @@ from horizon.utils import secret_key
+@@ -9,7 +9,7 @@ from horizon.utils import secret_key
  from openstack_dashboard import exceptions
  from openstack_dashboard.settings import HORIZON_CONFIG
  
@@ -21,7 +23,7 @@ index e53ee35..048958a 100644
  TEMPLATE_DEBUG = DEBUG
  
  
-@@ -27,7 +27,7 @@ WEBROOT = '/'
+@@ -28,7 +28,7 @@ WEBROOT = '/'
  # with the list of host/domain names that the application can serve.
  # For more information see:
  # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
@@ -29,8 +31,8 @@ index e53ee35..048958a 100644
 +ALLOWED_HOSTS = ['*']
  
  # Set SSL proxy settings:
- # For Django 1.4+ pass this header from the proxy after terminating the SSL,
-@@ -49,11 +49,11 @@ WEBROOT = '/'
+ # Pass this header from the proxy after terminating the SSL,
+@@ -53,12 +53,12 @@ WEBROOT = '/'
  # NOTE: The version should be formatted as it appears in the URL for the
  # service API. For example, The identity service APIs have inconsistent
  # use of the decimal point, so valid options would be 2.0 or 3.
@@ -38,25 +40,27 @@ index e53ee35..048958a 100644
 -#    "data-processing": 1.1,
 -#    "identity": 3,
 -#    "volume": 2,
+-#    "compute": 2,
 -#}
 +OPENSTACK_API_VERSIONS = {
 +    "data-processing": 1.1,
 +    "identity": 3,
 +    "volume": 2,
++    "compute": 2,
 +}
  
  # Set this to True if running on multi-domain model. When this is enabled, it
  # will require user to enter the Domain name in addition to username for login.
-@@ -90,7 +90,7 @@ WEBROOT = '/'
+@@ -110,7 +110,7 @@ WEBROOT = '/'
  # including on the login form.
  #HORIZON_CONFIG["disable_password_reveal"] = False
  
 -LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
-+LOCAL_PATH = '/tmp'
++LOCAL_PATH = '/run/lock/horizon'
  
  # Set custom secret key:
  # You can either set it to a specific value or you can let horizon generate a
-@@ -107,16 +107,10 @@ SECRET_KEY = secret_key.generate_or_read_from_file(
+@@ -127,16 +127,10 @@ SECRET_KEY = secret_key.generate_or_read_from_file(
  # We recommend you use memcached for development; otherwise after every reload
  # of the django development server, you will have to login again. To use
  # memcached set CACHES to something like
@@ -64,7 +68,7 @@ index e53ee35..048958a 100644
 -#    'default': {
 -#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
 -#        'LOCATION': '127.0.0.1:11211',
--#    }
+-#    },
 -#}
 -
  CACHES = {
@@ -72,10 +76,10 @@ index e53ee35..048958a 100644
 -        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
 +        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
 +        'LOCATION': '127.0.0.1:11211',
-     }
+     },
  }
  
-@@ -138,8 +132,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+@@ -158,8 +152,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
  #]
  
  OPENSTACK_HOST = "127.0.0.1"
@@ -87,5 +91,5 @@ index e53ee35..048958a 100644
  # Enables keystone web single-sign-on if set to True.
  #WEBSSO_ENABLED = False
 -- 
-2.6.2
+2.5.0
 
