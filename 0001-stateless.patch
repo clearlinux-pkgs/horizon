@@ -1,0 +1,25 @@
+From 409576425bebb70e25445c9ecf6ba65c6df6430e Mon Sep 17 00:00:00 2001
+From: Alberto Murillo <alberto.murillo.silva@intel.com>
+Date: Tue, 19 Apr 2016 17:13:54 -0500
+Subject: [PATCH] stateless
+
+---
+ openstack_dashboard/settings.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openstack_dashboard/settings.py b/openstack_dashboard/settings.py
+index 69ab6d0..5db9baa 100644
+--- a/openstack_dashboard/settings.py
++++ b/openstack_dashboard/settings.py
+@@ -293,7 +293,7 @@ except ImportError:
+     logging.warning("No local_settings file found.")
+ 
+ # allow to drop settings snippets into a local_settings_dir
+-LOCAL_SETTINGS_DIR_PATH = os.path.join(ROOT_PATH, "local", "local_settings.d")
++LOCAL_SETTINGS_DIR_PATH = os.path.join("/etc", "horizon", "local_settings.d")
+ if os.path.exists(LOCAL_SETTINGS_DIR_PATH):
+     for (dirpath, dirnames, filenames) in os.walk(LOCAL_SETTINGS_DIR_PATH):
+         for filename in sorted(filenames):
+-- 
+2.5.5
+
