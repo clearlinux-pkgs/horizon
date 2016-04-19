@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 9.0.0
-Release  : 41
+Release  : 42
 URL      : http://tarballs.openstack.org/horizon/horizon-9.0.0.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-9.0.0.tar.gz
 Source1  : horizon.tmpfiles
@@ -86,6 +86,7 @@ BuildRequires : stevedore
 Patch1: 0001-enable-dashboard-in-apache.patch
 Patch2: 0002-nginx-uwsgi.patch
 Patch3: 0003-default-config.patch
+Patch4: 0001-stateless.patch
 
 %description
 =============================
@@ -120,10 +121,12 @@ python components for the horizon package.
 
 
 %prep
+cd ..
 %setup -q -n horizon-9.0.0
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 python2 setup.py build -b py2
@@ -3529,8 +3532,8 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/dashboard/admin/flavors/table/flavors-table.controller.spec.js
 /usr/share/httpd/horizon/static/dashboard/admin/flavors/table/flavors-table.html
 /usr/share/httpd/horizon/static/dashboard/css/34f8a8f8d5e5.css
-/usr/share/httpd/horizon/static/dashboard/css/aefeaf52302b.css
-/usr/share/httpd/horizon/static/dashboard/css/b565908f2d4e.css
+/usr/share/httpd/horizon/static/dashboard/css/9bdcba02fa26.css
+/usr/share/httpd/horizon/static/dashboard/css/badfb5b9c5b0.css
 /usr/share/httpd/horizon/static/dashboard/identity/identity.module.js
 /usr/share/httpd/horizon/static/dashboard/identity/identity.module.spec.js
 /usr/share/httpd/horizon/static/dashboard/identity/projects/projects.module.js
@@ -3627,8 +3630,8 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/dashboard/img/wait-gray.svg
 /usr/share/httpd/horizon/static/dashboard/img/wait-green.svg
 /usr/share/httpd/horizon/static/dashboard/img/wait-red.svg
-/usr/share/httpd/horizon/static/dashboard/js/1df28a908600.js
-/usr/share/httpd/horizon/static/dashboard/js/7fd3f7d69c71.js
+/usr/share/httpd/horizon/static/dashboard/js/6c6d20b67751.js
+/usr/share/httpd/horizon/static/dashboard/js/d8f1634c7721.js
 /usr/share/httpd/horizon/static/dashboard/manifest.json
 /usr/share/httpd/horizon/static/dashboard/project/containers/_containers.scss
 /usr/share/httpd/horizon/static/dashboard/project/containers/containers-model.service.js
