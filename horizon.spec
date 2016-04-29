@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 9.0.0
-Release  : 42
+Release  : 43
 URL      : http://tarballs.openstack.org/horizon/horizon-9.0.0.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-9.0.0.tar.gz
 Source1  : horizon.tmpfiles
