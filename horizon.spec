@@ -4,7 +4,7 @@
 #
 Name     : horizon
 Version  : 9.0.0
-Release  : 45
+Release  : 46
 URL      : http://tarballs.openstack.org/horizon/horizon-9.0.0.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-9.0.0.tar.gz
 Source1  : horizon.tmpfiles
@@ -87,6 +87,7 @@ Patch1: 0001-enable-dashboard-in-apache.patch
 Patch2: 0002-nginx-uwsgi.patch
 Patch3: 0003-default-config.patch
 Patch4: 0001-stateless.patch
+Patch5: cve-2016-4428.patch
 
 %description
 =============================
@@ -121,14 +122,15 @@ python components for the horizon package.
 
 
 %prep
-cd ..
 %setup -q -n horizon-9.0.0
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %build
+export LANG=C
 python2 setup.py build -b py2
 
 %check
@@ -3434,8 +3436,10 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.svg
 /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.ttf
 /usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.woff
+/usr/share/httpd/horizon/static/bootstrap/fonts/bootstrap/glyphicons-halflings-regular.woff2
 /usr/share/httpd/horizon/static/bootstrap/js/bootstrap-sprockets.js
 /usr/share/httpd/horizon/static/bootstrap/js/bootstrap.js
+/usr/share/httpd/horizon/static/bootstrap/js/bootstrap.min.js
 /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/affix.js
 /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/alert.js
 /usr/share/httpd/horizon/static/bootstrap/js/bootstrap/button.js
@@ -3451,7 +3455,7 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-compass.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-mincer.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap-sprockets.scss
-/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/_bootstrap.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_alerts.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_badges.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_breadcrumbs.scss
@@ -3492,7 +3496,6 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_utilities.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_variables.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/_wells.scss
-/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/bootstrap.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_alerts.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_background-variant.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_border-radius.scss
@@ -3514,6 +3517,7 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_panels.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_progress-bar.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_reset-filter.scss
+/usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_reset-text.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_resize.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_responsive-visibility.scss
 /usr/share/httpd/horizon/static/bootstrap/scss/bootstrap/mixins/_size.scss
@@ -3532,8 +3536,8 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/dashboard/admin/flavors/table/flavors-table.controller.spec.js
 /usr/share/httpd/horizon/static/dashboard/admin/flavors/table/flavors-table.html
 /usr/share/httpd/horizon/static/dashboard/css/34f8a8f8d5e5.css
-/usr/share/httpd/horizon/static/dashboard/css/9bdcba02fa26.css
-/usr/share/httpd/horizon/static/dashboard/css/badfb5b9c5b0.css
+/usr/share/httpd/horizon/static/dashboard/css/714c16872e87.css
+/usr/share/httpd/horizon/static/dashboard/css/eab182848b95.css
 /usr/share/httpd/horizon/static/dashboard/identity/identity.module.js
 /usr/share/httpd/horizon/static/dashboard/identity/identity.module.spec.js
 /usr/share/httpd/horizon/static/dashboard/identity/projects/projects.module.js
@@ -3630,7 +3634,7 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/dashboard/img/wait-gray.svg
 /usr/share/httpd/horizon/static/dashboard/img/wait-green.svg
 /usr/share/httpd/horizon/static/dashboard/img/wait-red.svg
-/usr/share/httpd/horizon/static/dashboard/js/6c6d20b67751.js
+/usr/share/httpd/horizon/static/dashboard/js/5bb7375a47c6.js
 /usr/share/httpd/horizon/static/dashboard/js/d8f1634c7721.js
 /usr/share/httpd/horizon/static/dashboard/manifest.json
 /usr/share/httpd/horizon/static/dashboard/project/containers/_containers.scss
@@ -4055,7 +4059,7 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.vi.js
 /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-CN.js
 /usr/share/httpd/horizon/static/horizon/lib/bootstrap_datepicker/locales/bootstrap-datepicker.zh-TW.js
-/usr/share/httpd/horizon/static/horizon/lib/bootswatch/LICENSE
+/usr/share/httpd/horizon/static/horizon/lib/bootswatch/README.md
 /usr/share/httpd/horizon/static/horizon/lib/bootswatch/cerulean/_bootswatch.scss
 /usr/share/httpd/horizon/static/horizon/lib/bootswatch/cerulean/_variables.scss
 /usr/share/httpd/horizon/static/horizon/lib/bootswatch/cerulean/bootstrap.css
@@ -4693,9 +4697,9 @@ chown -R httpd:httpd /usr/share/httpd/horizon
 /usr/share/httpd/horizon/static/horizon/lib/mdi/fonts/materialdesignicons-webfont.ttf
 /usr/share/httpd/horizon/static/horizon/lib/mdi/fonts/materialdesignicons-webfont.woff
 /usr/share/httpd/horizon/static/horizon/lib/mdi/fonts/materialdesignicons-webfont.woff2
-/usr/share/httpd/horizon/static/horizon/lib/mdi/license.txt
 /usr/share/httpd/horizon/static/horizon/lib/mdi/preview.html
 /usr/share/httpd/horizon/static/horizon/lib/mdi/scss/_core.scss
+/usr/share/httpd/horizon/static/horizon/lib/mdi/scss/_extras.scss
 /usr/share/httpd/horizon/static/horizon/lib/mdi/scss/_icons.scss
 /usr/share/httpd/horizon/static/horizon/lib/mdi/scss/_path.scss
 /usr/share/httpd/horizon/static/horizon/lib/mdi/scss/_variables.scss
