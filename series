@@ -3,3 +3,4 @@
 0003-default-config.patch
 # 0004-Replace-memoized-for-another-solution.patch
 0001-stateless.patch
+cve-2016-4428.patch
