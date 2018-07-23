@@ -1,6 +1,6 @@
-0001-enable-dashboard-in-apache.patch
-0002-nginx-uwsgi.patch
-0003-default-config.patch
+#0001-enable-dashboard-in-apache.patch
+#0002-nginx-uwsgi.patch
+#0003-default-config.patch
 # 0004-Replace-memoized-for-another-solution.patch
-0001-stateless.patch
-cve-2016-4428.patch
+#0001-stateless.patch
+#cve-2016-4428.patch
