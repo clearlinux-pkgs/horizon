@@ -6,7 +6,7 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 48
+Release  : 49
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
@@ -138,6 +138,9 @@ BuildRequires : pytz
 BuildRequires : rjsmin
 BuildRequires : six
 BuildRequires : stevedore
+Patch1: 0001-enable-dashboard-in-apache.patch
+Patch2: 0002-nginx-uwsgi.patch
+Patch3: 0001-stateless.patch
 
 %description
 Horizon (OpenStack Dashboard)
@@ -185,13 +188,16 @@ python3 components for the horizon package.
 
 %prep
 %setup -q -n horizon-13.0.1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1532362146
+export SOURCE_DATE_EPOCH=1532362647
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
