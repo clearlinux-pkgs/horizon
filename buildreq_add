@@ -6,7 +6,6 @@ Django
 Pint
 django-babel
 django_compressor
-django_openstack_auth
 django-pyscss
 eventlet
 httplib2
