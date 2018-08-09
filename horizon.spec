@@ -6,7 +6,7 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 50
+Release  : 52
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
@@ -48,6 +48,7 @@ Requires: XStatic-smart-table
 Requires: XStatic-term.js
 Requires: django-babel
 Requires: django-pyscss
+Requires: django_compressor
 Requires: futurist
 Requires: iso8601
 Requires: keystoneauth1
@@ -121,7 +122,6 @@ BuildRequires : oslo.serialization
 BuildRequires : oslo.utils
 BuildRequires : pathlib
 BuildRequires : pbr
-BuildRequires : pip
 BuildRequires : prettytable
 BuildRequires : pyScss
 BuildRequires : python-ceilometerclient
@@ -134,10 +134,8 @@ BuildRequires : python-novaclient
 BuildRequires : python-saharaclient
 BuildRequires : python-swiftclient
 BuildRequires : python-troveclient
-BuildRequires : python3-dev
 BuildRequires : pytz
 BuildRequires : rjsmin
-BuildRequires : setuptools
 BuildRequires : six
 BuildRequires : stevedore
 Patch1: 0001-enable-dashboard-in-apache.patch
@@ -199,7 +197,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1532391562
+export SOURCE_DATE_EPOCH=1533822151
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
