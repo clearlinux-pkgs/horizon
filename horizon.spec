@@ -6,7 +6,7 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 53
+Release  : 54
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
@@ -27,6 +27,7 @@ Requires: XStatic-Angular
 Requires: XStatic-Angular-Bootstrap
 Requires: XStatic-Angular-FileUpload
 Requires: XStatic-Angular-Gettext
+Requires: XStatic-Angular-Schema-Form
 Requires: XStatic-Angular-lrdragndrop
 Requires: XStatic-Bootstrap-Datepicker
 Requires: XStatic-Bootstrap-SCSS
@@ -44,9 +45,11 @@ Requires: XStatic-bootswatch
 Requires: XStatic-jQuery
 Requires: XStatic-jquery-ui
 Requires: XStatic-mdi
+Requires: XStatic-objectpath
 Requires: XStatic-roboto-fontface
 Requires: XStatic-smart-table
 Requires: XStatic-term.js
+Requires: XStatic-tv4
 Requires: django-babel
 Requires: django-pyscss
 Requires: django_compressor
@@ -198,7 +201,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1533916291
+export SOURCE_DATE_EPOCH=1533924646
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
