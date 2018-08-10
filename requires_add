@@ -1,3 +1,6 @@
 # This file contains additional runtime requirements that did not get
 # picked up automatically. One name per line, no whitespace.
 django_compressor
+XStatic-Angular-FileUpload
+XStatic-jquery-ui
+
