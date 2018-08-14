@@ -1,0 +1,39 @@
+--- horizon-13.0.1/requirements.txt~	2018-05-08 13:24:11.000000000 +0000
++++ horizon-13.0.1/requirements.txt	2018-08-14 03:10:37.955583887 +0000
+@@ -10,7 +10,7 @@
+ pbr!=2.1.0,>=2.0.0 # Apache-2.0
+ # Horizon Core Requirements
+ Babel!=2.4.0,>=2.3.4 # BSD
+-Django<2.0,>=1.8 # BSD
++Django
+ Pint>=0.5 # BSD
+ django-babel>=0.5.1 # BSD
+ django-compressor>=2.0 # MIT
+@@ -27,7 +27,7 @@
+ oslo.utils>=3.33.0 # Apache-2.0
+ osprofiler>=1.4.0 # Apache-2.0
+ pymongo!=3.1,>=3.0.2 # Apache-2.0
+-pyScss!=1.3.5,>=1.3.4 # MIT License
++pyScss
+ python-cinderclient>=3.3.0 # Apache-2.0
+ python-glanceclient>=2.8.0 # Apache-2.0
+ python-keystoneclient>=3.8.0 # Apache-2.0
+--- horizon-13.0.1/horizon.egg-info/requires.txt~	2018-05-08 13:27:49.000000000 +0000
++++ horizon-13.0.1/horizon.egg-info/requires.txt	2018-08-14 03:11:02.850583540 +0000
+@@ -1,6 +1,6 @@
+ pbr!=2.1.0,>=2.0.0
+ Babel!=2.4.0,>=2.3.4
+-Django<2.0,>=1.8
++Django
+ Pint>=0.5
+ django-babel>=0.5.1
+ django-compressor>=2.0
+@@ -17,7 +17,7 @@
+ oslo.utils>=3.33.0
+ osprofiler>=1.4.0
+ pymongo!=3.1,>=3.0.2
+-pyScss!=1.3.5,>=1.3.4
++pyScss
+ python-cinderclient>=3.3.0
+ python-glanceclient>=2.8.0
+ python-keystoneclient>=3.8.0
