@@ -6,7 +6,7 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 55
+Release  : 56
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
@@ -14,10 +14,10 @@ Source99 : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz.asc
 Summary  : OpenStack Dashboard
 Group    : Development/Tools
 License  : Apache-2.0
-Requires: horizon-python3
-Requires: horizon-config
-Requires: horizon-license
-Requires: horizon-python
+Requires: horizon-config = %{version}-%{release}
+Requires: horizon-license = %{version}-%{release}
+Requires: horizon-python = %{version}-%{release}
+Requires: horizon-python3 = %{version}-%{release}
 Requires: Babel
 Requires: Django
 Requires: Pint
@@ -176,7 +176,7 @@ license components for the horizon package.
 %package python
 Summary: python components for the horizon package.
 Group: Default
-Requires: horizon-python3
+Requires: horizon-python3 = %{version}-%{release}
 
 %description python
 python components for the horizon package.
@@ -203,12 +203,12 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1534216391
+export SOURCE_DATE_EPOCH=1541266608
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-python3 setup.py build -b py3
+python3 setup.py build
 
 %check
 export http_proxy=http://127.0.0.1:9/
@@ -217,9 +217,9 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 /bin/bash run_tests.sh -N --no-pep8 || :
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/doc/horizon
-cp LICENSE %{buildroot}/usr/share/doc/horizon/LICENSE
-python3 -tt setup.py build -b py3 install --root=%{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/horizon
+cp LICENSE %{buildroot}/usr/share/package-licenses/horizon/LICENSE
+python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
 echo ----[ mark ]----
@@ -234,8 +234,8 @@ install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/tmpfiles.d/horizon.conf
 /usr/lib/tmpfiles.d/horizon.conf
 
 %files license
-%defattr(-,root,root,-)
-/usr/share/doc/horizon/LICENSE
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/horizon/LICENSE
 
 %files python
 %defattr(-,root,root,-)
