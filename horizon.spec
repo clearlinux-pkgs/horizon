@@ -6,7 +6,7 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 56
+Release  : 57
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
@@ -148,14 +148,9 @@ Patch3: 0001-stateless.patch
 Patch4: nodeps.patch
 
 %description
+=============================
 Horizon (OpenStack Dashboard)
-        =============================
-        
-        Horizon is a Django-based project aimed at providing a complete OpenStack
-        Dashboard along with an extensible framework for building new dashboards
-        from reusable components. The ``openstack_dashboard`` module is a reference
-        implementation of a Django site that uses the ``horizon`` app to provide
-        web-based interactions with the various OpenStack projects.
+=============================
 
 %package config
 Summary: config components for the horizon package.
@@ -203,11 +198,12 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1541266608
+export SOURCE_DATE_EPOCH=1551033080
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
+export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
 
 %check
