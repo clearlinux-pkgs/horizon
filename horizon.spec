@@ -6,11 +6,11 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 59
+Release  : 60
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
-Source99 : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz.asc
+Source2 : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz.asc
 Summary  : OpenStack Dashboard
 Group    : Development/Tools
 License  : Apache-2.0
@@ -83,7 +83,9 @@ BuildRequires : PyYAML
 BuildRequires : XStatic
 BuildRequires : XStatic-Angular
 BuildRequires : XStatic-Angular-Bootstrap
+BuildRequires : XStatic-Angular-FileUpload
 BuildRequires : XStatic-Angular-Gettext
+BuildRequires : XStatic-Angular-Schema-Form
 BuildRequires : XStatic-Angular-lrdragndrop
 BuildRequires : XStatic-Bootstrap-Datepicker
 BuildRequires : XStatic-Bootstrap-SCSS
@@ -102,19 +104,22 @@ BuildRequires : XStatic-bootswatch
 BuildRequires : XStatic-jQuery
 BuildRequires : XStatic-jquery-ui
 BuildRequires : XStatic-mdi
+BuildRequires : XStatic-objectpath
 BuildRequires : XStatic-roboto-fontface
 BuildRequires : XStatic-smart-table
 BuildRequires : XStatic-term.js
+BuildRequires : XStatic-tv4
 BuildRequires : buildreq-distutils3
 BuildRequires : django-appconf
 BuildRequires : django-babel
 BuildRequires : django-nose
 BuildRequires : django-pyscss
 BuildRequires : django_compressor
-BuildRequires : enum34
 BuildRequires : eventlet
+BuildRequires : futurist
 BuildRequires : httplib2
 BuildRequires : iso8601
+BuildRequires : keystoneauth1
 BuildRequires : kombu
 BuildRequires : netaddr
 BuildRequires : nose
@@ -124,10 +129,12 @@ BuildRequires : oslo.i18n
 BuildRequires : oslo.policy
 BuildRequires : oslo.serialization
 BuildRequires : oslo.utils
+BuildRequires : osprofiler
 BuildRequires : pathlib
 BuildRequires : pbr
 BuildRequires : prettytable
 BuildRequires : pyScss
+BuildRequires : pymongo
 BuildRequires : python-ceilometerclient
 BuildRequires : python-cinderclient
 BuildRequires : python-glanceclient
@@ -148,9 +155,14 @@ Patch3: 0001-stateless.patch
 Patch4: nodeps.patch
 
 %description
-=============================
 Horizon (OpenStack Dashboard)
-=============================
+        =============================
+        
+        Horizon is a Django-based project aimed at providing a complete OpenStack
+        Dashboard along with an extensible framework for building new dashboards
+        from reusable components. The ``openstack_dashboard`` module is a reference
+        implementation of a Django site that uses the ``horizon`` app to provide
+        web-based interactions with the various OpenStack projects.
 
 %package config
 Summary: config components for the horizon package.
@@ -197,12 +209,13 @@ python3 components for the horizon package.
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1551033080
-export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1571081503
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FCFLAGS="$CFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FFLAGS="$CFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CXXFLAGS="$CXXFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
 export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
 
@@ -212,9 +225,10 @@ export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 /bin/bash run_tests.sh -N --no-pep8 || :
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/horizon
-cp LICENSE %{buildroot}/usr/share/package-licenses/horizon/LICENSE
+cp %{_builddir}/horizon-13.0.1/LICENSE %{buildroot}/usr/share/package-licenses/horizon/294b43b2cec9919063be1a3b49e8722648424779
 python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
@@ -231,7 +245,7 @@ install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/tmpfiles.d/horizon.conf
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/horizon/LICENSE
+/usr/share/package-licenses/horizon/294b43b2cec9919063be1a3b49e8722648424779
 
 %files python
 %defattr(-,root,root,-)
