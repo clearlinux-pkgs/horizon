@@ -6,11 +6,11 @@
 #
 Name     : horizon
 Version  : 13.0.1
-Release  : 62
+Release  : 63
 URL      : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source0  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz
 Source1  : horizon.tmpfiles
-Source2 : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz.asc
+Source2  : http://tarballs.openstack.org/horizon/horizon-13.0.1.tar.gz.asc
 Summary  : OpenStack Dashboard
 Group    : Development/Tools
 License  : Apache-2.0
@@ -155,14 +155,56 @@ Patch3: 0001-stateless.patch
 Patch4: nodeps.patch
 
 %description
+=============================
 Horizon (OpenStack Dashboard)
-        =============================
-        
-        Horizon is a Django-based project aimed at providing a complete OpenStack
-        Dashboard along with an extensible framework for building new dashboards
-        from reusable components. The ``openstack_dashboard`` module is a reference
-        implementation of a Django site that uses the ``horizon`` app to provide
-        web-based interactions with the various OpenStack projects.
+=============================
+
+Horizon is a Django-based project aimed at providing a complete OpenStack
+Dashboard along with an extensible framework for building new dashboards
+from reusable components. The ``openstack_dashboard`` module is a reference
+implementation of a Django site that uses the ``horizon`` app to provide
+web-based interactions with the various OpenStack projects.
+
+* Release management: https://launchpad.net/horizon
+* Blueprints and feature specifications: https://blueprints.launchpad.net/horizon
+* Issue tracking: https://bugs.launchpad.net/horizon
+
+.. image:: https://governance.openstack.org/tc/badges/horizon.svg
+    :target: https://governance.openstack.org/tc/reference/tags/index.html
+
+Using Horizon
+=============
+
+See ``doc/source/install/index.rst`` about how to install Horizon
+in your OpenStack setup. It describes the example steps and
+has pointers for more detailed settings and configurations.
+
+It is also available at
+`Installation Guide <https://docs.openstack.org/horizon/latest/install/index.html>`_.
+
+Getting Started for Developers
+==============================
+
+``doc/source/quickstart.rst`` or
+`Quickstart Guide <https://docs.openstack.org/horizon/latest/contributor/quickstart.html>`_
+describes how to setup Horizon development environment and start development.
+
+Building Contributor Documentation
+==================================
+
+This documentation is written by contributors, for contributors.
+
+The source is maintained in the ``doc/source`` directory using
+`reStructuredText`_ and built by `Sphinx`_
+
+.. _reStructuredText: http://docutils.sourceforge.net/rst.html
+.. _Sphinx: http://sphinx-doc.org/
+
+To build the docs, use::
+
+  $ tox -e docs
+
+Results are in the ``doc/build/html`` directory
 
 %package config
 Summary: config components for the horizon package.
@@ -193,6 +235,7 @@ python components for the horizon package.
 Summary: python3 components for the horizon package.
 Group: Default
 Requires: python3-core
+Provides: pypi(horizon)
 
 %description python3
 python3 components for the horizon package.
@@ -200,6 +243,7 @@ python3 components for the horizon package.
 
 %prep
 %setup -q -n horizon-13.0.1
+cd %{_builddir}/horizon-13.0.1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -210,12 +254,13 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1571081503
+export SOURCE_DATE_EPOCH=1582935451
+# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
-export CFLAGS="$CFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FCFLAGS="$CFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FFLAGS="$CFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
-export CXXFLAGS="$CXXFLAGS -fno-lto -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CFLAGS="$CFLAGS -fcf-protection=full -fno-lto -fstack-protector-strong "
+export FCFLAGS="$CFLAGS -fcf-protection=full -fno-lto -fstack-protector-strong "
+export FFLAGS="$CFLAGS -fcf-protection=full -fno-lto -fstack-protector-strong "
+export CXXFLAGS="$CXXFLAGS -fcf-protection=full -fno-lto -fstack-protector-strong "
 export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
 
@@ -235,6 +280,9 @@ cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
 echo ----[ mark ]----
 mkdir -p %{buildroot}/usr/lib/tmpfiles.d
 install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/tmpfiles.d/horizon.conf
+## install_append content
+
+## install_append end
 
 %files
 %defattr(-,root,root,-)
